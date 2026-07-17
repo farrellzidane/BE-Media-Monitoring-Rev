@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+
+data/articles.csv
+data/articles.json
+data/articles.db
+ml/datasets/news_headlines.csv
+ml/datasets/sentiment_dataset.csv
+ml/models/
+checkpoint-*/
+
+venv/
+.venv/
+
+.env
