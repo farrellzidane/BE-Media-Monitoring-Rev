@@ -12,7 +12,10 @@ from services.analytics_service import (
     get_source_ranking,
     get_top_keywords,
 )
-from services.data_quality_service import get_data_quality_report
+from services.data_quality_service import (
+    get_data_quality_report,
+    get_data_quality_rule_evidence,
+)
 
 
 ARTICLE_COLUMNS = (
@@ -71,6 +74,21 @@ class MonitoringService:
             ),
             "articles": enriched_articles,
         }
+
+    def get_quality_rule_evidence(
+        self,
+        rule_key,
+        result_filter,
+        limit,
+        offset,
+    ):
+        return get_data_quality_rule_evidence(
+            rule_key=rule_key,
+            result_filter=result_filter,
+            limit=limit,
+            offset=offset,
+            repository=self.repository,
+        )
 
 
 monitoring_service = MonitoringService()
