@@ -1,48 +1,31 @@
-from transformers import pipeline
-
-classifier = None
-
-
-def initialize_model():
-    global classifier
-
-    if classifier is None:
-        classifier = pipeline(
-            "sentiment-analysis",
-            model="cardiffnlp/twitter-xlm-roberta-base-sentiment",
-            tokenizer="cardiffnlp/twitter-xlm-roberta-base-sentiment"
-        )
+from ml.models.predict import predict
 
 
 def analyze_sentiment(text):
+    """
+    Analyze sentiment using the locally fine-tuned IndoBERT model.
+
+    Returns:
+    {
+        "label": "Positive",
+        "confidence": 0.91,
+        "scores": {
+            "Negative": 0.03,
+            "Neutral": 0.06,
+            "Positive": 0.91
+        }
+    }
+    """
 
     if not text:
         return {
             "label": "Neutral",
-            "confidence": 0.0
+            "confidence": 0.0,
+            "scores": {
+                "Negative": 0.0,
+                "Neutral": 1.0,
+                "Positive": 0.0
+            }
         }
 
-    initialize_model()
-
-    result = classifier(
-        text[:512]
-    )[0]
-
-    label_map = {
-        "label_0": "Negative",
-        "label_1": "Neutral",
-        "label_2": "Positive",
-        "negative": "Negative",
-        "neutral": "Neutral",
-        "positive": "Positive",
-    }
-
-    raw_label = str(result["label"]).strip().lower()
-
-    return {
-        "label": label_map.get(raw_label, "Neutral"),
-        "confidence": round(
-            result["score"],
-            4
-        )
-    }
+    return predict(text)

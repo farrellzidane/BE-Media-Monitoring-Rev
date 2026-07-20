@@ -130,6 +130,25 @@ def get_articles_with_sentiment(
 
     return enriched_articles
 
+def get_average_confidence(
+    repository: ArticleRepository = article_repository
+):
+
+    articles = get_articles_with_sentiment(repository)
+
+    if not articles:
+        return 0.0
+
+    total = sum(
+        article["confidence"]
+        for article in articles
+    )
+
+    return round(
+        total / len(articles),
+        4
+    )
+
 def get_daily_volume(
     days=30,
     repository: ArticleRepository = article_repository

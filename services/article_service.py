@@ -4,6 +4,7 @@ import json
 from dataclasses import asdict
 
 from repositories.article_repository import get_all_articles
+from services.sentiment_service import analyze_sentiment
 
 
 def normalize_category(category):
@@ -334,7 +335,6 @@ from services.sentiment_service import (
     analyze_sentiment
 )
 
-
 def get_sentiment_by_source():
 
     articles = get_all_articles()
@@ -343,12 +343,26 @@ def get_sentiment_by_source():
 
     for article in articles:
 
+        # article tuple:
+        # 0 = title
+        # 1 = source
+        # 2 = category
+        # 3 = published_date
+        # 4 = crawl_date
+        # 5 = url
+        # 6 = content
+
         title = article[0]
         source = article[1]
+        content = article[6] or ""
 
-        sentiment = analyze_sentiment(
-            title
-        )
+        # Gunakan format yang sama seperti saat training:
+        # title + content
+        text = f"{title}. {content}"
+
+        result = analyze_sentiment(text)
+
+        sentiment = result["label"]
 
         if source not in source_stats:
             source_stats[source] = {
