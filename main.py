@@ -15,9 +15,11 @@ from services.article_service import (
 from database.database import (
     close_database,
     create_database,
+    get_all_articles,
     save_articles_to_database,
-    clear_articles
 )
+
+from models.article import Article
 
 from config.settings import (
     DATA_DIR,
@@ -30,8 +32,6 @@ from datetime import datetime, timedelta
 def main():
 
     create_database()
-
-    clear_articles()
 
     sources = SOURCES
 
@@ -95,18 +95,32 @@ def main():
         articles
     )
 
+    save_articles_to_database(
+        articles
+    )
+
+    # Keep the file exports in sync with the accumulated database contents.
+    persisted_articles = [
+        Article(
+            title=row[0],
+            source=row[1],
+            category=row[2],
+            published_date=row[3],
+            crawl_date=row[4],
+            url=row[5],
+            content=row[6],
+        )
+        for row in get_all_articles()
+    ]
+
     save_articles(
-        articles,
+        persisted_articles,
         OUTPUT_FILE
     )
 
     save_articles_csv(
-        articles,
+        persisted_articles,
         str(DATA_DIR / "articles.csv")
-    )
-
-    save_articles_to_database(
-        articles
     )
 
 
