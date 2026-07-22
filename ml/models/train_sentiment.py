@@ -3,8 +3,10 @@
 # ======================================
 
 import os
+import random
 import numpy as np
 import pandas as pd
+import torch
 
 from datasets import Dataset
 
@@ -12,7 +14,8 @@ from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification,
     TrainingArguments,
-    Trainer
+    Trainer,
+    DataCollatorWithPadding
 )
 
 from sklearn.metrics import (
@@ -24,7 +27,7 @@ from sklearn.metrics import (
 # CONFIGURATION
 # ======================================
 
-MODEL_NAME = "indobenchmark/indobert-base-p2"
+MODEL_NAME = "indobenchmark/indobert-base-p1"
 
 TRAIN_FILE = "ml/datasets/processed/train.csv"
 VALID_FILE = "ml/datasets/processed/valid.csv"
@@ -33,11 +36,37 @@ OUTPUT_DIR = "ml/models/saved_model"
 
 NUM_LABELS = 3
 MAX_LENGTH = 256
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 LEARNING_RATE = 2e-5
-NUM_EPOCHS = 5
+NUM_EPOCHS = 3
+SEED = 42
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# ======================================
+# RANDOM SEED
+# ======================================
+
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
+
+# ======================================
+# DEVICE
+# ======================================
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+print("=" * 60)
+print("DEVICE")
+print("=" * 60)
+print(device)
+
+if device == "cuda":
+    print(torch.cuda.get_device_name(0))
 
 # ======================================
 # LOAD DATASET
@@ -46,9 +75,10 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 train_df = pd.read_csv(TRAIN_FILE)
 valid_df = pd.read_csv(VALID_FILE)
 
+print("\n" + "=" * 60)
+print("DATASET")
 print("=" * 60)
-print("DATASET INFORMATION")
-print("=" * 60)
+
 print(f"Training Data   : {len(train_df)}")
 print(f"Validation Data : {len(valid_df)}")
 
@@ -67,6 +97,10 @@ print("\nLoading Tokenizer...")
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
+data_collator = DataCollatorWithPadding(
+    tokenizer=tokenizer
+)
+
 print("Tokenizer Loaded!")
 
 # ======================================
@@ -74,10 +108,10 @@ print("Tokenizer Loaded!")
 # ======================================
 
 def tokenize_function(examples):
+
     return tokenizer(
         examples["text"],
         truncation=True,
-        padding="max_length",
         max_length=MAX_LENGTH
     )
 
@@ -95,8 +129,15 @@ valid_dataset = valid_dataset.map(
 # PREPARE DATASET
 # ======================================
 
-train_dataset = train_dataset.rename_column("label_id", "labels")
-valid_dataset = valid_dataset.rename_column("label_id", "labels")
+train_dataset = train_dataset.rename_column(
+    "label_id",
+    "labels"
+)
+
+valid_dataset = valid_dataset.rename_column(
+    "label_id",
+    "labels"
+)
 
 train_dataset.set_format(
     type="torch",
@@ -146,7 +187,10 @@ def compute_metrics(eval_pred):
         zero_division=0
     )
 
-    accuracy = accuracy_score(labels, predictions)
+    accuracy = accuracy_score(
+        labels,
+        predictions
+    )
 
     return {
         "accuracy": accuracy,
@@ -160,10 +204,13 @@ def compute_metrics(eval_pred):
 # ======================================
 
 training_args = TrainingArguments(
+
     output_dir=OUTPUT_DIR,
 
     eval_strategy="epoch",
     save_strategy="epoch",
+
+    save_total_limit=1,
 
     learning_rate=LEARNING_RATE,
 
@@ -179,20 +226,28 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
 
     metric_for_best_model="f1",
-
     greater_is_better=True,
 
-    report_to="none"
+    report_to="none",
+
+    seed=SEED
 )
 
 # ======================================
 # TRAINER
 # ======================================
+
 trainer = Trainer(
+
     model=model,
+
     args=training_args,
+
     train_dataset=train_dataset,
     eval_dataset=valid_dataset,
+
+    data_collator=data_collator,
+
     compute_metrics=compute_metrics
 )
 
@@ -200,7 +255,9 @@ trainer = Trainer(
 # TRAIN
 # ======================================
 
-print("\nStarting Training...\n")
+print("\n" + "=" * 60)
+print("START TRAINING")
+print("=" * 60)
 
 trainer.train()
 
@@ -208,7 +265,9 @@ trainer.train()
 # EVALUATE
 # ======================================
 
-print("\nEvaluating...\n")
+print("\n" + "=" * 60)
+print("FINAL EVALUATION")
+print("=" * 60)
 
 metrics = trainer.evaluate()
 
@@ -222,8 +281,7 @@ trainer.save_model(OUTPUT_DIR)
 
 tokenizer.save_pretrained(OUTPUT_DIR)
 
-print("\n===================================")
-print("Training Finished!")
-print("Model saved to:")
-print(OUTPUT_DIR)
-print("===================================")
+print("\n" + "=" * 60)
+print("TRAINING FINISHED")
+print("=" * 60)
+print(f"Model saved to : {OUTPUT_DIR}")
