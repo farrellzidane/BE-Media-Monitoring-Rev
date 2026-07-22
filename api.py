@@ -3,14 +3,22 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from infrastructure.sqlite_database import initialize_database
+from infrastructure.postgresql_database import (
+    close_database_pool,
+    initialize_database,
+    open_database_pool,
+)
 from presentation.routes import router
 
 
 @asynccontextmanager
 async def lifespan(_app):
-    initialize_database()
-    yield
+    open_database_pool()
+    try:
+        initialize_database()
+        yield
+    finally:
+        close_database_pool()
 
 
 def create_app():

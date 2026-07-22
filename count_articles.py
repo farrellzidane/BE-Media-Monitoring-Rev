@@ -1,17 +1,14 @@
-import sqlite3
-
-conn = sqlite3.connect(
-    "data/articles.db"
+from infrastructure.postgresql_database import (
+    close_database_pool,
+    database_connection,
 )
 
-cur = conn.cursor()
 
-cur.execute(
-    "SELECT COUNT(*) FROM articles"
-)
-
-print(
-    cur.fetchone()[0]
-)
-
-conn.close()
+try:
+    with database_connection() as connection:
+        count = connection.execute(
+            "SELECT COUNT(*) FROM articles"
+        ).fetchone()[0]
+    print(count)
+finally:
+    close_database_pool()

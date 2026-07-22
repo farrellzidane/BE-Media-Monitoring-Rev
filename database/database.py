@@ -3,8 +3,8 @@
 New code should use the repository and infrastructure layers directly.
 """
 
-from infrastructure.sqlite_database import (
-    DATABASE_FILE,
+from infrastructure.postgresql_database import (
+    close_database_pool,
     initialize_database,
 )
 from repositories.article_repository import article_repository
@@ -13,6 +13,10 @@ from services.article_service import normalize_category
 
 def create_database():
     initialize_database()
+
+
+def close_database():
+    close_database_pool()
 
 
 def clear_articles():
@@ -37,7 +41,7 @@ def save_articles_to_database(articles):
 
     article_repository.save(records)
     print()
-    print(f"Saved to {DATABASE_FILE}")
+    print("Saved to PostgreSQL database")
 
 
 def search_articles(keyword):

@@ -1,4 +1,6 @@
-from infrastructure.sqlite_database import database_connection
+from datetime import date, datetime
+
+from infrastructure.postgresql_database import database_connection
 
 
 ARTICLE_SELECT = """
@@ -17,22 +19,29 @@ ARTICLE_SELECT = """
 class ArticleRepository:
     def save(self, records):
         with database_connection() as connection:
-            connection.executemany(
-                """
-                INSERT OR REPLACE INTO articles (
-                    title,
-                    url,
-                    source,
-                    category,
-                    published_date,
-                    crawl_date,
-                    content
+            with connection.cursor() as cursor:
+                cursor.executemany(
+                    """
+                    INSERT INTO articles (
+                        title,
+                        url,
+                        source,
+                        category,
+                        published_date,
+                        crawl_date,
+                        content
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (url) DO UPDATE SET
+                        title = EXCLUDED.title,
+                        source = EXCLUDED.source,
+                        category = EXCLUDED.category,
+                        published_date = EXCLUDED.published_date,
+                        crawl_date = EXCLUDED.crawl_date,
+                        content = EXCLUDED.content
+                    """,
+                    records,
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                records,
-            )
-            connection.commit()
 
     def clear(self):
         with database_connection() as connection:
@@ -41,7 +50,6 @@ class ArticleRepository:
             ).fetchone()[0]
 
             connection.execute("DELETE FROM articles")
-            connection.commit()
 
             after = connection.execute(
                 "SELECT COUNT(*) FROM articles"
@@ -60,8 +68,8 @@ class ArticleRepository:
             f"""
             {ARTICLE_SELECT}
             WHERE
-                LOWER(title) LIKE LOWER(?)
-                OR LOWER(content) LIKE LOWER(?)
+                title ILIKE %s
+                OR content ILIKE %s
             ORDER BY published_date DESC
             """,
             (pattern, pattern),
@@ -71,7 +79,7 @@ class ArticleRepository:
         return self._fetch_all(
             f"""
             {ARTICLE_SELECT}
-            WHERE LOWER(source) = LOWER(?)
+            WHERE LOWER(source) = LOWER(%s)
             ORDER BY published_date DESC
             """,
             (source,),
@@ -81,7 +89,7 @@ class ArticleRepository:
         return self._fetch_all(
             f"""
             {ARTICLE_SELECT}
-            WHERE LOWER(category) = LOWER(?)
+            WHERE LOWER(category) = LOWER(%s)
             ORDER BY published_date DESC
             """,
             (category,),
@@ -91,7 +99,7 @@ class ArticleRepository:
         return self._fetch_all(
             f"""
             {ARTICLE_SELECT}
-            WHERE published_date = ?
+            WHERE published_date = %s
             ORDER BY published_date DESC
             """,
             (date,),
@@ -100,10 +108,32 @@ class ArticleRepository:
     @staticmethod
     def _fetch_all(query, parameters=()):
         with database_connection() as connection:
-            return connection.execute(
+            rows = connection.execute(
                 query,
                 parameters,
             ).fetchall()
+        return [_serialize_article(row) for row in rows]
+
+
+def _serialize_article(row):
+    article = list(row)
+    article[3] = _serialize_date(article[3])
+    article[4] = _serialize_datetime(article[4])
+    return tuple(article)
+
+
+def _serialize_date(value):
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    return value
+
+
+def _serialize_datetime(value):
+    if isinstance(value, datetime):
+        return value.isoformat(sep=" ", timespec="seconds")
+    return value
 
 
 article_repository = ArticleRepository()

@@ -13,6 +13,7 @@ from services.article_service import (
 
 
 from database.database import (
+    close_database,
     create_database,
     save_articles_to_database,
     clear_articles
@@ -24,9 +25,6 @@ from config.settings import (
 )
 
 from datetime import datetime, timedelta
-
-#import os
-#print("DB PATH:", os.path.abspath("data/articles.db"))
 
 
 def main():
@@ -113,4 +111,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        close_database()

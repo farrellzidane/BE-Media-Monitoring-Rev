@@ -1,24 +1,18 @@
-import sqlite3
 import pandas as pd
 
-import os
-print("DB PATH:", os.path.abspath("data/articles.db"))
+from infrastructure.postgresql_database import close_database_pool
+from repositories.article_repository import article_repository
 
-conn = sqlite3.connect("data/articles.db")
 
-query = """
-SELECT
-    title,
-    source,
-    category,
-    published_date
-FROM articles
-ORDER BY published_date DESC
-"""
+try:
+    articles = article_repository.get_all()
+finally:
+    close_database_pool()
 
-df = pd.read_sql_query(query, conn)
-
-conn.close()
+df = pd.DataFrame(
+    (article[:4] for article in articles),
+    columns=["title", "source", "category", "published_date"],
+)
 
 print(df.head())
 print()

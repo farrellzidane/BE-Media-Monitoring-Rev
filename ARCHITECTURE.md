@@ -9,7 +9,7 @@ api.py
      -> application/     use-case orchestration and response composition
         -> services/     analytics and domain operations
         -> repositories/ persistence operations
-           -> infrastructure/ SQLite connection and schema
+           -> infrastructure/ PostgreSQL pool and schema
 ```
 
 ## Layer responsibilities
@@ -20,7 +20,8 @@ api.py
 - `services` contains the existing analytics, sentiment, crawling, and data
   quality logic.
 - `repositories` owns article queries and persistence operations.
-- `infrastructure` owns SQLite configuration, connections, and schema setup.
+- `infrastructure` owns PostgreSQL configuration, pooled connections, and
+  schema setup.
 - `database/database.py` is a compatibility facade for existing scripts. New
   code should depend on `repositories` or `infrastructure` as appropriate.
 
