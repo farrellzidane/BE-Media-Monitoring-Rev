@@ -30,6 +30,9 @@ OKEZONE_URLS = [
 SINDONEWS_URLS = [
     "https://ekbis.sindonews.com"
 ]
+TRIBUN_URLS = [
+    "https://www.tribunnews.com"
+]
 KUMPARAN_GRAPHQL_URL = (
     "https://cdn-graphql-v4.kumparan.com/query"
 )
