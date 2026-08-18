@@ -63,6 +63,8 @@ class PostgreSQLAPITests(unittest.TestCase):
                     "2026-07-22",
                     "2026-07-22 10:01:53",
                     "Isi artikel ekonomi yang cukup panjang. " * 10,
+                    "Neutral",
+                    1.0,
                 )
             ])
 

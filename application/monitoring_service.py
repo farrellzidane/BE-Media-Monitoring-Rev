@@ -26,6 +26,8 @@ ARTICLE_COLUMNS = (
     "crawl_date",
     "url",
     "content",
+    "sentiment",
+    "confidence",
 )
 
 

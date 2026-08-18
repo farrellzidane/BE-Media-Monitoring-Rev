@@ -9,6 +9,7 @@ from infrastructure.postgresql_database import (
 )
 from repositories.article_repository import article_repository
 from services.article_service import normalize_category
+from services.sentiment_service import analyze_sentiment
 
 
 def create_database():
@@ -26,18 +27,26 @@ def clear_articles():
 
 
 def save_articles_to_database(articles):
-    records = [
-        (
-            article.title,
-            article.url,
-            article.source,
-            normalize_category(article.category),
-            article.published_date,
-            article.crawl_date,
-            article.content,
+    records = []
+
+    for article in articles:
+        sentiment = analyze_sentiment(
+            f"{article.title}\n\n{article.content or ''}"
         )
-        for article in articles
-    ]
+
+        records.append(
+            (
+                article.title,
+                article.url,
+                article.source,
+                normalize_category(article.category),
+                article.published_date,
+                article.crawl_date,
+                article.content,
+                sentiment["label"],
+                sentiment["confidence"],
+            )
+        )
 
     article_repository.save(records)
     print()

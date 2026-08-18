@@ -5,10 +5,6 @@ from repositories.article_repository import (
     article_repository,
 )
 
-from services.sentiment_service import (
-    analyze_sentiment
-)
-
 from sklearn.feature_extraction.text import (
     TfidfVectorizer
 )
@@ -89,6 +85,8 @@ OBJECTIVE_WORDS = {
 def get_articles_with_sentiment(
     repository: ArticleRepository = article_repository
 ):
+    """Reads the sentiment computed once at crawl time instead of running
+    the model on every request (see database.save_articles_to_database)."""
 
     articles = repository.get_all()
 
@@ -103,16 +101,8 @@ def get_articles_with_sentiment(
         crawl_date = article[4]
         url = article[5]
         content = article[6] or ""
-
-        full_text = (
-            title
-            + "\n\n"
-            + content
-        )
-
-        sentiment_data = analyze_sentiment(
-            full_text
-        )
+        sentiment = article[7] or "Neutral"
+        confidence = article[8] if article[8] is not None else 0.0
 
         enriched_articles.append(
             {
@@ -123,8 +113,8 @@ def get_articles_with_sentiment(
                 "crawl_date": crawl_date,
                 "url": url,
                 "content": content,
-                "sentiment": sentiment_data["label"],
-                "confidence": sentiment_data["confidence"]
+                "sentiment": sentiment,
+                "confidence": confidence
             }
         )
 

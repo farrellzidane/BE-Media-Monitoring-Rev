@@ -11,13 +11,18 @@ ARTICLE_SELECT = """
         published_date,
         crawl_date,
         url,
-        content
+        content,
+        sentiment,
+        sentiment_confidence
     FROM articles
 """
 
 
 class ArticleRepository:
     def save(self, records):
+        """Persists articles. Each record must include a precomputed
+        (sentiment, sentiment_confidence) pair so the API never has to run
+        the sentiment model on the request path."""
         with database_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.executemany(
@@ -29,16 +34,20 @@ class ArticleRepository:
                         category,
                         published_date,
                         crawl_date,
-                        content
+                        content,
+                        sentiment,
+                        sentiment_confidence
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (url) DO UPDATE SET
                         title = EXCLUDED.title,
                         source = EXCLUDED.source,
                         category = EXCLUDED.category,
                         published_date = EXCLUDED.published_date,
                         crawl_date = EXCLUDED.crawl_date,
-                        content = EXCLUDED.content
+                        content = EXCLUDED.content,
+                        sentiment = EXCLUDED.sentiment,
+                        sentiment_confidence = EXCLUDED.sentiment_confidence
                     """,
                     records,
                 )

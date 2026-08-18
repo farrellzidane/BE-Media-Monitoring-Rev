@@ -82,7 +82,28 @@ def initialize_database():
                 category TEXT,
                 published_date DATE,
                 crawl_date TIMESTAMP WITHOUT TIME ZONE,
-                content TEXT
+                content TEXT,
+                sentiment TEXT,
+                sentiment_confidence DOUBLE PRECISION
             )
             """
         )
+        # Backfills existing databases created before sentiment columns existed.
+        # ALTER TABLE requires table ownership even when the column already
+        # exists, so only run it when a plain (unprivileged) SELECT shows the
+        # column is actually missing.
+        _ensure_column(connection, "sentiment", "TEXT")
+        _ensure_column(connection, "sentiment_confidence", "DOUBLE PRECISION")
+
+
+def _ensure_column(connection, column, column_type):
+    exists = connection.execute(
+        """
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'articles' AND column_name = %s
+        """,
+        (column,),
+    ).fetchone()
+    if exists:
+        return
+    connection.execute(f"ALTER TABLE articles ADD COLUMN {column} {column_type}")

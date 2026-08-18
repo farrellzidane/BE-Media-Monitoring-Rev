@@ -26,6 +26,8 @@ class ArticleRepositoryTests(unittest.TestCase):
                 "2026-07-20",
                 "2026-07-20 12:00:00",
                 "Content",
+                "Neutral",
+                1.0,
             )
         ]
 
@@ -38,7 +40,7 @@ class ArticleRepositoryTests(unittest.TestCase):
 
         query, parameters = cursor.executemany.call_args.args
         self.assertIn("ON CONFLICT (url) DO UPDATE", query)
-        self.assertIn("VALUES (%s, %s, %s, %s, %s, %s, %s)", query)
+        self.assertIn("VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", query)
         self.assertNotIn("?", query)
         self.assertEqual(parameters, records)
 
@@ -53,6 +55,8 @@ class ArticleRepositoryTests(unittest.TestCase):
                 datetime(2026, 7, 20, 12, 30, 45, 123456),
                 "https://example.com/article",
                 "Content",
+                "Neutral",
+                1.0,
             )
         ]
 

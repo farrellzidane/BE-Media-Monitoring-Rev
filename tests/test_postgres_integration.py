@@ -53,6 +53,8 @@ class PostgreSQLIntegrationTests(unittest.TestCase):
             "2026-07-20",
             "2026-07-20 12:30:45",
             "Isi berita ekonomi yang lengkap.",
+            "Neutral",
+            1.0,
         )
 
     def test_schema_save_upsert_filters_and_date_contract(self):
