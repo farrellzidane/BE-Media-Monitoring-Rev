@@ -7,12 +7,10 @@ data/articles.db
 ml/datasets/news_headlines.csv
 ml/datasets/sentiment_dataset.csv
 
-# Ignore trained model weights
-ml/models/saved_model/
-
-checkpoint-*/
-
 venv/
 .venv/
 
 .env
+
+ml/models/saved_model_backup*/
+ml/models/*.zip
