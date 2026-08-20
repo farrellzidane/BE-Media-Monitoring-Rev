@@ -10,7 +10,7 @@ OUTPUT_DIR.mkdir(
     exist_ok=True
 )
 
-OUTPUT_FILE = OUTPUT_DIR / "financial_news.csv"
+OUTPUT_FILE = OUTPUT_DIR / "cybersecurity_news.csv"
 
 
 def export_dataset():

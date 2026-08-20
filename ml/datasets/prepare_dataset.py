@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-INPUT_FILE = "ml/datasets/labeled/financial_news_labeled.csv"
+INPUT_FILE = "ml/datasets/labeled/cybersecurity_news_labeled.csv"
 OUTPUT_DIR = "ml/datasets/processed"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)

@@ -39,10 +39,10 @@ client = OpenAI(
 
 MODEL = "qwen/qwen3.5-35b-a3b"
 
-INPUT_FILE = "ml/datasets/raw/financial_news.csv"
+INPUT_FILE = "ml/datasets/raw/cybersecurity_news.csv"
 
 OUTPUT_FILE = (
-    "ml/datasets/labeled/financial_news_labeled.csv"
+    "ml/datasets/labeled/cybersecurity_news_labeled.csv"
 )
 
 
@@ -51,9 +51,9 @@ OUTPUT_FILE = (
 # ======================================
 
 PROMPT = """
-You are a professional financial sentiment analyst.
+You are a professional cybersecurity sentiment analyst covering Indonesian media.
 
-Your task is to classify the FINANCIAL SENTIMENT of the article.
+Your task is to classify the CYBERSECURITY SENTIMENT of the article.
 
 Analyze BOTH:
 
@@ -71,78 +71,55 @@ Negative
 IMPORTANT CLASSIFICATION RULE
 ========================
 
-Classify the article based on its OVERALL FINANCIAL IMPACT.
+Classify the article based on its OVERALL IMPACT ON CYBERSECURITY / DIGITAL SAFETY
+for the affected organization, users, government, or the public.
 
 Do NOT classify an article as Neutral merely because it is reporting facts.
 
-If the article contains a clear financial development that is beneficial or harmful to a company, investor, market, consumer, or the economy, classify it as Positive or Negative.
+If the article contains a clear development that is beneficial or harmful to
+digital security, data protection, or the affected organization/public, classify
+it as Positive or Negative.
 
 
 ========================
 POSITIVE
 ========================
 
-Choose Positive when the overall financial implication is beneficial.
+Choose Positive when the overall security implication is beneficial.
 
 Examples include:
 
-- Revenue increases
-- Profit increases
-- Earnings beat expectations
-- Business growth
-- Business expansion
-- Successful investment
-- Successful fundraising
-- New partnership that benefits the business
-- Stock price increases
-- IHSG increases
-- Currency strengthens
-- Credit rating upgrade
-- Increased exports
-- Increased investment
-- Economic growth
-- Strong financial outlook
-- Improved liquidity
-- Higher production
-- Successful IPO
-- Successful debt issuance
-- Government policy that clearly supports business or economic growth
+- A vulnerability is discovered and successfully patched/fixed
+- An attack, breach, or intrusion attempt is successfully blocked or prevented
+- Law enforcement arrests hackers, or takes down a ransomware/malware group
+- A company/agency strengthens its security systems or passes a security audit
+- New security regulation, standard, or policy that improves data protection
+- Successful recovery from an incident with no lasting harm
+- Security researchers responsibly disclose a flaw before it is exploited
+- Increased cybersecurity awareness, training, or investment that reduces risk
+- A platform improves user privacy or data protection features
+- Stolen data or systems are successfully recovered
 
 
 ========================
 NEGATIVE
 ========================
 
-Choose Negative when the overall financial implication is harmful, risky, or deteriorating.
+Choose Negative when the overall security implication is harmful, risky, or damaging.
 
 Examples include:
 
-- Revenue decreases
-- Profit decreases
-- Losses
-- Earnings miss expectations
-- Layoffs caused by financial problems
-- Bankruptcy
-- Default
-- Debt problems
-- Credit rating downgrade
-- Lawsuit with financial consequences
-- Corruption with financial consequences
-- Stock price decreases
-- IHSG decreases
-- Currency weakens significantly
-- Inflation that negatively affects purchasing power or businesses
-- Rising prices that negatively affect consumers or businesses
-- Oil price spikes that create economic or business pressure
-- Geopolitical conflict that negatively affects markets
-- Economic slowdown
-- Weak financial outlook
-- Liquidity problems
-- Declining production
-- Failed IPO
-- Failed investment
-- Financial uncertainty
-- Supply disruption that creates financial damage
+- Data breach or leak (kebocoran data)
+- Hacking, defacement, or unauthorized access (peretasan)
+- Ransomware, malware, or phishing attack (serangan siber)
+- DDoS attack causing service disruption
+- Vulnerability discovered but left unpatched / actively exploited
+- Personal, financial, or government data exposed or sold
+- Identity theft or fraud enabled by a security failure
+- Critical infrastructure, government, or financial systems compromised
+- Security negligence, misconfiguration, or cover-up by an organization
+- Financial or reputational loss caused by a cyber incident
+- New/emerging cyber threat, exploit, or attack technique with no mitigation yet
 
 
 ========================
@@ -153,38 +130,45 @@ Some articles contain BOTH positive and negative information.
 
 Do NOT automatically choose Neutral.
 
-Instead, determine the DOMINANT financial impact.
+Instead, determine the DOMINANT security impact.
 
 Examples:
 
-1. A company reports higher profit but also higher debt.
-   Choose Positive if the overall financial result is clearly strong.
+1. A company is breached but responds quickly, patches the flaw, and no data
+   is confirmed stolen. Choose Negative if the breach itself is the dominant
+   event, or Positive if the response fully neutralized the harm before any
+   real damage occurred.
 
-2. A company reports higher revenue but suffers major losses.
-   Choose Negative if the overall financial result is harmful.
+2. A vulnerability is disclosed together with a patch already available.
+   Choose Positive if the patch is what makes the article newsworthy, Negative
+   if active exploitation in the wild is still emphasized.
 
-3. Stock price rises despite some negative background information.
-   Choose Positive if the market impact is clearly positive.
+3. Hackers are arrested after a long-running attack campaign.
+   Choose Positive, since the dominant news is the successful law-enforcement
+   outcome, even though the underlying attack was harmful.
 
-4. An article discusses a policy and explains both benefits and risks.
-   Choose the label representing the dominant expected financial impact.
+4. An article discusses a new regulation and explains both its protections
+   and its compliance burden. Choose the label representing the dominant
+   expected impact on digital security/data protection.
 
 
 ========================
 NEUTRAL
 ========================
 
-Choose Neutral ONLY when there is genuinely NO clear dominant positive or negative financial impact.
+Choose Neutral ONLY when there is genuinely NO clear dominant positive or
+negative security impact.
 
 Examples:
 
-- Purely informational explanations
-- Definitions of financial terms
-- General educational articles
-- Schedules or announcements with no clear financial impact
-- Profiles that contain no meaningful financial development
-- Price information that does not indicate a meaningful positive or negative trend
-- Reports that simply describe an event without financial consequences
+- Purely informational explanations of cybersecurity concepts or terms
+- General educational articles or how-to/tips content
+- Schedules, conference announcements, or product launches with no clear
+  security consequence
+- Profiles or interviews that contain no meaningful security development
+- Statistics or reports that simply describe a trend without a clear
+  beneficial or harmful outcome
+- Opinion pieces that merely discuss the topic without reporting an event
 
 
 ========================
@@ -193,28 +177,30 @@ IMPORTANT DECISION RULES
 
 1. NEVER choose Neutral simply because the article is factual.
 
-2. ALWAYS consider financial consequences.
+2. ALWAYS consider the consequences for digital security, data protection,
+   or the affected organization/public.
 
-3. If the article reports a clear increase or improvement in financial performance:
+3. If the article reports a clear improvement, fix, prevention, or successful
+   defense/law-enforcement action:
    Positive.
 
-4. If the article reports a clear decrease, loss, risk, or deterioration:
+4. If the article reports a clear attack, breach, leak, exploit, or
+   deterioration in security:
    Negative.
 
 5. If both Positive and Negative signals exist:
-   Choose the DOMINANT overall financial impact.
+   Choose the DOMINANT overall security impact.
 
-6. If the article discusses market movement:
+6. If the article discusses a vulnerability:
 
-   - Market rises / strengthens -> Positive
-   - Market falls / weakens -> Negative
+   - Disclosed with a fix/patch already applied, and that is the focus -> Positive
+   - Actively exploited or left unpatched -> Negative
+   - Merely described with no clear consequence yet -> Neutral
 
-7. If the article discusses a price increase:
+7. If the article discusses an attacker/threat actor:
 
-   - Determine WHO is financially affected.
-   - Higher selling prices benefiting producers -> potentially Positive.
-   - Higher prices harming consumers/businesses -> potentially Negative.
-   - If there is no clear financial implication -> Neutral.
+   - Caught, blocked, or dismantled -> Positive
+   - Successful or ongoing attack, still at large -> Negative
 
 8. Do NOT use Neutral as a safe fallback.
 
@@ -240,21 +226,21 @@ Example:
 
 {
     "label": "Positive",
-    "reason": "The company reported higher revenue and stronger profit, indicating improved financial performance."
+    "reason": "The vulnerability was disclosed and patched before it could be exploited, indicating an improvement in security."
 }
 
 Another example:
 
 {
     "label": "Negative",
-    "reason": "The company reported declining revenue and significant losses, indicating deteriorating financial performance."
+    "reason": "The company suffered a data breach exposing customer information, indicating a serious security failure."
 }
 
 Another example:
 
 {
     "label": "Neutral",
-    "reason": "The article provides general financial information without a clear dominant positive or negative financial impact."
+    "reason": "The article provides general educational information about cybersecurity without a clear dominant positive or negative security impact."
 }
 
 

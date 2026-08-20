@@ -1,6 +1,6 @@
 import pandas as pd
 
-FILE = "ml/datasets/labeled/financial_news_labeled.csv"
+FILE = "ml/datasets/labeled/cybersecurity_news_labeled.csv"
 
 df = pd.read_csv(FILE)
 
