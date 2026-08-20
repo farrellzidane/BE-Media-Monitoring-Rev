@@ -23,6 +23,7 @@ from sklearn.metrics import (
     precision_recall_fscore_support
 )
 
+
 # ======================================
 # CONFIGURATION
 # ======================================
@@ -36,12 +37,32 @@ OUTPUT_DIR = "ml/models/saved_model"
 
 NUM_LABELS = 3
 MAX_LENGTH = 256
+
 BATCH_SIZE = 4
 LEARNING_RATE = 2e-5
 NUM_EPOCHS = 3
+
 SEED = 42
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+# ======================================
+# LABEL MAPPING
+# ======================================
+
+LABEL_MAP = {
+    "Negative": 0,
+    "Neutral": 1,
+    "Positive": 2
+}
+
+ID2LABEL = {
+    0: "Negative",
+    1: "Neutral",
+    2: "Positive"
+}
+
 
 # ======================================
 # RANDOM SEED
@@ -53,6 +74,7 @@ torch.manual_seed(SEED)
 
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
+
 
 # ======================================
 # DEVICE
@@ -68,6 +90,7 @@ print(device)
 if device == "cuda":
     print(torch.cuda.get_device_name(0))
 
+
 # ======================================
 # LOAD DATASET
 # ======================================
@@ -82,6 +105,72 @@ print("=" * 60)
 print(f"Training Data   : {len(train_df)}")
 print(f"Validation Data : {len(valid_df)}")
 
+print("\nTraining Label Distribution:")
+print(train_df["label"].value_counts())
+
+print("\nValidation Label Distribution:")
+print(valid_df["label"].value_counts())
+
+
+# ======================================
+# CALCULATE CLASS WEIGHTS
+# ======================================
+
+class_counts = (
+    train_df["label_id"]
+    .value_counts()
+    .reindex(range(NUM_LABELS), fill_value=0)
+)
+
+print("\n" + "=" * 60)
+print("CLASS WEIGHTS")
+print("=" * 60)
+
+print("Class counts:")
+print(class_counts)
+
+# Inverse-frequency weighting.
+# Negative has very few examples, so it receives a larger weight.
+total_samples = len(train_df)
+
+class_weights = []
+
+for class_id in range(NUM_LABELS):
+
+    count = class_counts[class_id]
+
+    if count == 0:
+        weight = 1.0
+    else:
+        weight = total_samples / (NUM_LABELS * count)
+
+    class_weights.append(weight)
+
+class_weights = torch.tensor(
+    class_weights,
+    dtype=torch.float
+)
+
+print("\nRaw class weights:")
+for i, weight in enumerate(class_weights):
+    print(
+        f"{ID2LABEL[i]:<10}: {weight.item():.4f}"
+    )
+
+# Prevent the extremely small Negative class
+# from receiving an excessively large weight.
+class_weights = torch.clamp(
+    class_weights,
+    max=5.0
+)
+
+print("\nFinal class weights:")
+for i, weight in enumerate(class_weights):
+    print(
+        f"{ID2LABEL[i]:<10}: {weight.item():.4f}"
+    )
+
+
 # ======================================
 # CONVERT TO HF DATASET
 # ======================================
@@ -89,19 +178,23 @@ print(f"Validation Data : {len(valid_df)}")
 train_dataset = Dataset.from_pandas(train_df)
 valid_dataset = Dataset.from_pandas(valid_df)
 
+
 # ======================================
 # TOKENIZER
 # ======================================
 
 print("\nLoading Tokenizer...")
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_NAME
+)
 
 data_collator = DataCollatorWithPadding(
     tokenizer=tokenizer
 )
 
 print("Tokenizer Loaded!")
+
 
 # ======================================
 # TOKENIZATION
@@ -115,6 +208,7 @@ def tokenize_function(examples):
         max_length=MAX_LENGTH
     )
 
+
 train_dataset = train_dataset.map(
     tokenize_function,
     batched=True
@@ -124,6 +218,7 @@ valid_dataset = valid_dataset.map(
     tokenize_function,
     batched=True
 )
+
 
 # ======================================
 # PREPARE DATASET
@@ -157,6 +252,7 @@ valid_dataset.set_format(
     ]
 )
 
+
 # ======================================
 # LOAD MODEL
 # ======================================
@@ -165,10 +261,13 @@ print("\nLoading Model...")
 
 model = AutoModelForSequenceClassification.from_pretrained(
     MODEL_NAME,
-    num_labels=NUM_LABELS
+    num_labels=NUM_LABELS,
+    id2label=ID2LABEL,
+    label2id=LABEL_MAP
 )
 
 print("Model Loaded!")
+
 
 # ======================================
 # METRICS
@@ -178,13 +277,27 @@ def compute_metrics(eval_pred):
 
     logits, labels = eval_pred
 
-    predictions = np.argmax(logits, axis=-1)
+    predictions = np.argmax(
+        logits,
+        axis=-1
+    )
 
-    precision, recall, f1, _ = precision_recall_fscore_support(
-        labels,
-        predictions,
-        average="weighted",
-        zero_division=0
+    precision, recall, f1, _ = (
+        precision_recall_fscore_support(
+            labels,
+            predictions,
+            average="macro",
+            zero_division=0
+        )
+    )
+
+    weighted_precision, weighted_recall, weighted_f1, _ = (
+        precision_recall_fscore_support(
+            labels,
+            predictions,
+            average="weighted",
+            zero_division=0
+        )
     )
 
     accuracy = accuracy_score(
@@ -194,10 +307,53 @@ def compute_metrics(eval_pred):
 
     return {
         "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1
+        "macro_precision": precision,
+        "macro_recall": recall,
+        "macro_f1": f1,
+        "weighted_precision": weighted_precision,
+        "weighted_recall": weighted_recall,
+        "weighted_f1": weighted_f1
     }
+
+
+# ======================================
+# WEIGHTED TRAINER
+# ======================================
+
+class WeightedTrainer(Trainer):
+
+    def compute_loss(
+        self,
+        model,
+        inputs,
+        return_outputs=False,
+        num_items_in_batch=None
+    ):
+
+        labels = inputs.pop("labels")
+
+        outputs = model(**inputs)
+
+        logits = outputs.logits
+
+        weights = class_weights.to(
+            logits.device
+        )
+
+        loss_function = torch.nn.CrossEntropyLoss(
+            weight=weights
+        )
+
+        loss = loss_function(
+            logits,
+            labels
+        )
+
+        if return_outputs:
+            return loss, outputs
+
+        return loss
+
 
 # ======================================
 # TRAINING ARGUMENTS
@@ -225,7 +381,7 @@ training_args = TrainingArguments(
 
     load_best_model_at_end=True,
 
-    metric_for_best_model="f1",
+    metric_for_best_model="macro_f1",
     greater_is_better=True,
 
     report_to="none",
@@ -233,11 +389,12 @@ training_args = TrainingArguments(
     seed=SEED
 )
 
+
 # ======================================
 # TRAINER
 # ======================================
 
-trainer = Trainer(
+trainer = WeightedTrainer(
 
     model=model,
 
@@ -251,6 +408,7 @@ trainer = Trainer(
     compute_metrics=compute_metrics
 )
 
+
 # ======================================
 # TRAIN
 # ======================================
@@ -261,8 +419,9 @@ print("=" * 60)
 
 trainer.train()
 
+
 # ======================================
-# EVALUATE
+# FINAL EVALUATION
 # ======================================
 
 print("\n" + "=" * 60)
@@ -271,17 +430,44 @@ print("=" * 60)
 
 metrics = trainer.evaluate()
 
-print(metrics)
+print("\nFinal Metrics:")
+
+for key, value in metrics.items():
+
+    if isinstance(value, float):
+
+        print(
+            f"{key:<25}: {value:.4f}"
+        )
+
+    else:
+
+        print(
+            f"{key:<25}: {value}"
+        )
+
 
 # ======================================
 # SAVE MODEL
 # ======================================
 
-trainer.save_model(OUTPUT_DIR)
+trainer.save_model(
+    OUTPUT_DIR
+)
 
-tokenizer.save_pretrained(OUTPUT_DIR)
+tokenizer.save_pretrained(
+    OUTPUT_DIR
+)
+
+
+# ======================================
+# FINISHED
+# ======================================
 
 print("\n" + "=" * 60)
 print("TRAINING FINISHED")
 print("=" * 60)
-print(f"Model saved to : {OUTPUT_DIR}")
+
+print(
+    f"Model saved to : {OUTPUT_DIR}"
+)

@@ -1,7 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+from pathlib import Path
 
-MODEL_PATH = "ml/models/saved_model"
+MODEL_PATH = Path(__file__).resolve().parent / "saved_model_full" / "saved_model"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,9 +51,11 @@ def predict(text: str):
 
 if __name__ == "__main__":
 
-    text = """
-    IHSG ditutup menguat hampir 2 persen setelah investor asing kembali melakukan pembelian besar.
-    """
+    text = text = """
+        Perusahaan mengalami kerugian besar setelah pendapatan turun drastis.
+        Manajemen mengumumkan PHK terhadap ribuan karyawan akibat kondisi keuangan yang memburuk.
+        Harga saham perusahaan juga anjlok tajam setelah laporan keuangan dirilis.
+"""
 
     result = predict(text)
 

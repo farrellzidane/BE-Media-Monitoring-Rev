@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import requests
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
@@ -69,7 +70,13 @@ def get_latest_article_urls(limit=MAX_ARTICLES):
         if "/plus" in href:
             continue
 
-        full_url = TEMPO_URL + href.split("?")[0]
+        # `href` begins with `/ekonomi/...`; concatenating it with the
+        # section URL (`https://www.tempo.co/ekonomi`) produced an invalid
+        # `/ekonomi/ekonomi/...` URL.  urljoin resolves it from the domain.
+        full_url = urljoin(
+            TEMPO_URL,
+            href.split("?")[0]
+        )
 
         if full_url in processed_urls:
             continue

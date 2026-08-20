@@ -1,5 +1,12 @@
 from config.sources import SOURCES
 
+from config.settings import (
+    DATA_DIR,
+    OUTPUT_FILE,
+    TOPIC_KEYWORDS,
+    NEWS_TOPIC
+)
+
 from services.crawler_service import (
     crawl_articles
 )
@@ -11,33 +18,45 @@ from services.article_service import (
     remove_duplicates
 )
 
-
 from database.database import (
     close_database,
     create_database,
-    get_all_articles,
     save_articles_to_database,
 )
 
-from models.article import Article
-
-from config.settings import (
-    DATA_DIR,
-    OUTPUT_FILE
-)
-
 from datetime import datetime, timedelta
+
+
+def is_topic_related(article):
+
+    text = (
+        f"{article.title} "
+        f"{article.content}"
+    ).lower()
+
+    keywords = TOPIC_KEYWORDS.get(
+        NEWS_TOPIC,
+        []
+    )
+
+    return any(
+        keyword.lower() in text
+        for keyword in keywords
+    )
 
 
 def main():
 
     create_database()
 
-    sources = SOURCES
-
     articles = []
 
-    for source_name, get_urls, get_article in sources:
+    print()
+    print("=" * 40)
+    print(f"CRAWLING TOPIC: {NEWS_TOPIC}")
+    print("=" * 40)
+
+    for source_name, get_urls, get_article in SOURCES:
 
         source_articles = crawl_articles(
             get_urls,
@@ -49,12 +68,34 @@ def main():
             source_articles
         )
 
-    articles = remove_duplicates(
-        articles
+    print()
+    print(
+        f"Total crawled before topic filter: "
+        f"{len(articles)}"
     )
-    # =====================================================
-    # Keep only recent news
-    # =====================================================
+
+    # ========================================
+    # TOPIC FILTER
+    # ========================================
+
+    topic_articles = [
+        article
+        for article in articles
+        if is_topic_related(article)
+    ]
+
+    print(
+        f"Articles matching {NEWS_TOPIC}: "
+        f"{len(topic_articles)}"
+    )
+
+    articles = remove_duplicates(
+        topic_articles
+    )
+
+    # ========================================
+    # KEEP RECENT NEWS
+    # ========================================
 
     today = datetime.today().date()
     max_age = timedelta(days=30)
@@ -67,15 +108,18 @@ def main():
             continue
 
         try:
+
             published = datetime.strptime(
                 article.published_date,
                 "%Y-%m-%d"
             ).date()
 
             if today - published <= max_age:
-                filtered_articles.append(article)
+                filtered_articles.append(
+                    article
+                )
 
-        except:
+        except Exception:
             continue
 
     articles = filtered_articles
@@ -85,47 +129,58 @@ def main():
         reverse=True
     )
 
+    # ========================================
+    # FINAL RESULT
+    # ========================================
+
     print()
+    print("=" * 40)
+    print("FINAL TOPIC RESULT")
+    print("=" * 40)
+
     print(
-        f"Successfully crawled "
-        f"{len(articles)} articles."
+        f"Topic      : {NEWS_TOPIC}"
     )
+
+    print(
+        f"Articles   : {len(articles)}"
+    )
+
+    print("=" * 40)
 
     print_statistics(
         articles
     )
 
+    # ========================================
+    # SAVE
+    # ========================================
+
     save_articles_to_database(
         articles
     )
 
-    # Keep the file exports in sync with the accumulated database contents.
-    persisted_articles = [
-        Article(
-            title=row[0],
-            source=row[1],
-            category=row[2],
-            published_date=row[3],
-            crawl_date=row[4],
-            url=row[5],
-            content=row[6],
-        )
-        for row in get_all_articles()
-    ]
-
     save_articles(
-        persisted_articles,
+        articles,
         OUTPUT_FILE
     )
 
     save_articles_csv(
-        persisted_articles,
+        articles,
         str(DATA_DIR / "articles.csv")
+    )
+
+    print()
+    print(
+        f"Saved {len(articles)} "
+        f"{NEWS_TOPIC} articles."
     )
 
 
 if __name__ == "__main__":
+
     try:
         main()
+
     finally:
         close_database()

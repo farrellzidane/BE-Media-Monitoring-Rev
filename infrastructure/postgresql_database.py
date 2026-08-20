@@ -2,10 +2,15 @@ import os
 
 from contextlib import contextmanager
 
+from dotenv import load_dotenv
 from psycopg_pool import ConnectionPool
 
 
+load_dotenv()
+
+
 DATABASE_URL_ENV = "DATABASE_URL"
+
 DEFAULT_POOL_MIN_SIZE = 1
 DEFAULT_POOL_MAX_SIZE = 10
 
@@ -14,10 +19,12 @@ _database_pool = None
 
 def get_database_url():
     database_url = os.environ.get(DATABASE_URL_ENV, "").strip()
+
     if not database_url:
         raise RuntimeError(
             "DATABASE_URL is required. Set it to a PostgreSQL connection URL."
         )
+
     return database_url
 
 
@@ -28,11 +35,19 @@ def open_database_pool():
         return _database_pool
 
     min_size = int(
-        os.environ.get("DATABASE_POOL_MIN_SIZE", DEFAULT_POOL_MIN_SIZE)
+        os.environ.get(
+            "DATABASE_POOL_MIN_SIZE",
+            DEFAULT_POOL_MIN_SIZE
+        )
     )
+
     max_size = int(
-        os.environ.get("DATABASE_POOL_MAX_SIZE", DEFAULT_POOL_MAX_SIZE)
+        os.environ.get(
+            "DATABASE_POOL_MAX_SIZE",
+            DEFAULT_POOL_MAX_SIZE
+        )
     )
+
     if min_size < 0 or max_size < 1 or min_size > max_size:
         raise RuntimeError(
             "Invalid database pool size: expected 0 <= min size <= max size."
@@ -44,12 +59,15 @@ def open_database_pool():
         max_size=max_size,
         open=False,
     )
+
     try:
         pool.open(wait=True)
     except Exception:
         pool.close()
         raise
+
     _database_pool = pool
+
     return pool
 
 
@@ -66,12 +84,14 @@ def close_database_pool():
 @contextmanager
 def database_connection():
     pool = open_database_pool()
+
     with pool.connection() as connection:
         yield connection
 
 
 def initialize_database():
     with database_connection() as connection:
+
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS articles (
@@ -88,6 +108,7 @@ def initialize_database():
             )
             """
         )
+
         # Backfills existing databases created before sentiment columns existed.
         # ALTER TABLE requires table ownership even when the column already
         # exists, so only run it when a plain (unprivileged) SELECT shows the
@@ -104,6 +125,10 @@ def _ensure_column(connection, column, column_type):
         """,
         (column,),
     ).fetchone()
+
     if exists:
         return
-    connection.execute(f"ALTER TABLE articles ADD COLUMN {column} {column_type}")
+
+    connection.execute(
+        f"ALTER TABLE articles ADD COLUMN {column} {column_type}"
+    )
