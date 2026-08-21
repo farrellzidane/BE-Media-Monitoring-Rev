@@ -20,7 +20,7 @@ class FakeArticleRepository:
 def article(
     title="Judul unik",
     source="Media Satu",
-    category="Business",
+    category="General Cybersecurity",
     published_date="2026-07-20",
     crawl_date="2026-07-20 11:00:00",
     url="https://example.com/article",

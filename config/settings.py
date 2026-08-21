@@ -461,14 +461,14 @@ ARTICLE_RETENTION_DAYS = 30
 # ============================================================
 
 ALLOWED_ARTICLE_CATEGORIES = {
-    "General",
-    "Business",
-    "Financial",
-    "Sports",
-    "International",
-    "Entertainment",
-    "Science",
-    "Law",
-    "Regional",
-    "Fact Check",
+    "Malware & Ransomware",
+    "Phishing & Social Engineering",
+    "Data Breach & Leak",
+    "Hacking & Cyber Crime",
+    "Vulnerability & Exploit",
+    "DDoS & Network Attack",
+    "Cyber Espionage & Warfare",
+    "Security Technology & Defense",
+    "Policy & Regulation",
+    "General Cybersecurity",
 }

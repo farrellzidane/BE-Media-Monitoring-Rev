@@ -1,179 +1,118 @@
 import csv
 import json
+import re
 
 from dataclasses import asdict
+from functools import lru_cache
 
 from repositories.article_repository import get_all_articles
 from services.sentiment_service import analyze_sentiment
 
 
-def normalize_category(category):
+# Cybersecurity subtopics, keyed by the keywords whose presence in an
+# article's title/lead identifies that subtopic. Only used for articles that
+# have already passed topic_verification_service's cybersecurity check, so
+# every article gets a subtopic and "General Cybersecurity" is the catch-all
+# for ones that don't match a more specific bucket.
+CYBERSECURITY_TAXONOMY = {
+    "Malware & Ransomware": (
+        "malware", "ransomware", "spyware", "trojan", "worm", "keylogger",
+        "rootkit", "cryptojacking", "virus komputer",
+    ),
+    "Phishing & Social Engineering": (
+        "phishing", "spear phishing", "smishing", "vishing",
+        "social engineering", "penipuan digital", "penipuan online",
+        "online scam", "scam", "credential theft", "credential stealing",
+        "password attack", "brute force", "brute-force",
+        "account takeover", "identity theft", "pencurian identitas",
+    ),
+    "Data Breach & Leak": (
+        "data breach", "data breaches", "data leak", "data leakage",
+        "kebocoran data", "bocor data", "pencurian data", "database breach",
+        "stolen data", "exposed data", "data exposure", "data theft",
+    ),
+    "Hacking & Cyber Crime": (
+        "hacker", "hackers", "hacking", "hacked", "diretas", "meretas",
+        "peretasan", "peretas", "dibobol", "membobol", "cybercriminal",
+        "cybercriminals", "cyber criminal", "cyber criminals",
+        "kejahatan siber", "cybercrime", "pelaku peretasan",
+        "kelompok hacker",
+    ),
+    "Vulnerability & Exploit": (
+        "vulnerability", "vulnerabilities", "kerentanan", "security flaw",
+        "security flaws", "zero day", "zero-day", "exploit", "exploitation",
+        "remote code execution", "rce", "privilege escalation",
+        "command injection", "sql injection", "cross site scripting", "xss",
+        "buffer overflow", "security patch", "patch keamanan",
+        "celah keamanan",
+    ),
+    "DDoS & Network Attack": (
+        "ddos", "denial of service", "distributed denial of service",
+        "network security", "serangan jaringan", "keamanan jaringan",
+    ),
+    "Cyber Espionage & Warfare": (
+        "cyber espionage", "spionase siber", "cyberwar", "cyber warfare",
+        "advanced persistent threat", "apt group", "nation-state",
+    ),
+    "Security Technology & Defense": (
+        "firewall", "endpoint security", "endpoint protection", "antivirus",
+        "anti-virus", "security operation center",
+        "security operations center", "soc", "siem", "zero trust",
+        "multi factor authentication", "multifactor authentication",
+        "multi-factor authentication", "mfa", "two factor authentication",
+        "two-factor authentication", "2fa", "encryption", "enkripsi",
+        "decryption", "identity access management", "iam",
+        "access control", "threat detection", "intrusion detection",
+        "intrusion prevention",
+    ),
+    "Policy & Regulation": (
+        "badan siber dan sandi negara", "bssn", "cybersecurity agency",
+        "regulasi keamanan", "undang-undang perlindungan data",
+        "perlindungan data pribadi", "uu pdp", "kominfo", "compliance",
+        "kebijakan keamanan", "security advisory",
+    ),
+}
 
-    if not category:
-        return "Unknown"
+CYBERSECURITY_CATEGORIES = tuple(CYBERSECURITY_TAXONOMY) + ("General Cybersecurity",)
 
-    category = category.lower().strip()
+ARTICLE_LEAD_LENGTH = 3000
 
-    mapping = {
-        
-        "news": "General",
-        "berita": "General",
-        "nasional": "General",
-        "peristiwa": "General",
-        "metropolitan": "General",
-        "megapolitan": "General",
-        "politik": "General",
-        "arsip": "General",
-        "adv": "General",
-        "advertorial": "General",
-        "epaper": "General",
-        "photo": "General",
-        "foto-news": "General",
-        "foto-bisnis": "General",
-        "video": "General",
-        "kolom": "General",
-        "tokoh": "General",
-        "wawancara": "General",
-        "prelude": "General",
-        "adikarya-parlemen": "General",
 
-        "economy": "Business",
-        "market": "Business",
-        "ekonomi": "Business",
-        "ekbis": "Business",
-        "money": "Business",
-        "bisnis": "Business",
-        "business": "Business",
-        "consumer": "Business",
-        "crypto": "Business",
-        "saham": "Business",
-        "energi": "Business",
-        "moneter": "Business",
-        "industri": "Business",
-        "properti": "Business",
-        "berita-ekonomi-bisnis": "Business",
-        "ekonomi-hijau": "Business",
-        "bursa-dan-valas": "Business",
-        "finance": "Business",
-        "fintech": "Business",
-        "entrepreneur": "Business",
-        "infrastruktur": "Business",
+@lru_cache(maxsize=None)
+def _keyword_pattern(term):
+    phrase = r"\s+".join(re.escape(part) for part in term.split())
+    return re.compile(rf"(?<!\w){phrase}(?!\w)", re.IGNORECASE)
 
-        "sport": "Sports",
-        "sports": "Sports",
-        "sportstars": "Sports",
-        "olahraga": "Sports",
-        "bola": "Sports",
-        "sepakbola": "Sports",
-        "superskor": "Sports",
-        "superball": "Sports",
-        "sport-lain": "Sports",
-        "sportstyle": "Sports",
-        "raket": "Sports",
-        "moto-gp": "Sports",
-        "olympic": "Sports",
-        "piala-dunia": "Sports",
-        "basket": "Sports",
-        "bola-jatim": "Sports",
 
-        "international": "International",
-        "internasional": "International",
-        "global": "International",
+def categorize_cybersecurity_topic(title, content):
+    """Classify a (pre-verified) cybersecurity article into a subtopic,
+    based on keyword evidence in the title and lead content. Title matches
+    are weighted higher than lead matches. Falls back to the catch-all
+    bucket when no subtopic keyword is present."""
 
-        "celebrity": "Entertainment",
-        "showbiz": "Entertainment",
-        "entertainment": "Entertainment",
-        "hiburan": "Entertainment",
-        "lifestyle": "Entertainment",
-        "gaya-hidup": "Entertainment",
-        "travel": "Entertainment",
-        "food-travel": "Entertainment",
-        "food": "Entertainment",
-        "woman": "Entertainment",
-        "mom": "Entertainment",
-        "musik": "Entertainment",
-        "seleb": "Entertainment",
-        "persona": "Entertainment",
-        "hype": "Entertainment",
-        "ibu-dan-anak": "Entertainment",
-        "tvscope": "Entertainment",
-        "tren": "Entertainment",
-        "teroka": "Entertainment",
+    title = title or ""
+    lead = (content or "")[:ARTICLE_LEAD_LENGTH]
 
-        "tech": "Science",
-        "tekno": "Science",
-        "teknologi": "Science",
-        "science": "Science",
-        "tekno-sains": "Science",
-        "cyberlife": "Science",
-        "digital": "Science",
-        "security": "Science",
-        "review-produk": "Science",
-        "fotoinet": "Science",
-        "techno": "Science",
-        "ototekno": "Science",
-        "telco": "Science",
-        "tips-dan-trik": "Science",
-        "laptop-dan-pc": "Science",
-        "info-sehat": "Science",
-        "lingkungan": "Science",
-        "sains": "Science",
-        "research": "Science",
+    best_category = None
+    best_score = 0
 
-        "crime": "Law",
-        "hukum": "Law",
-        "kemenkumham": "Law",
+    for category, keywords in CYBERSECURITY_TAXONOMY.items():
+        score = 0
 
-        "regional": "Regional",
-        "daerah": "Regional",
+        for keyword in keywords:
+            pattern = _keyword_pattern(keyword)
 
-        "bandung": "Regional",
-        "metro-bandung": "Regional",
-        "kabupaten-bandung": "Regional",
-        "jabar-region": "Regional",
-        "jabar-istimewa": "Regional",
-        "ciamis": "Regional",
-        "garut": "Regional",
-        "cirebon": "Regional",
-        "sumedang": "Regional",
-        "tasik": "Regional",
-        "banyuwangi": "Regional",
+            if pattern.search(title):
+                score += 3
 
-        "jatim": "Regional",
-        "bojonegoro": "Regional",
-        "blitar": "Regional",
-        "kediri": "Regional",
-        "jombang": "Regional",
-        "madura": "Regional",
-        "malang": "Regional",
-        "mojokerto": "Regional",
-        "probolinggo": "Regional",
-        "surabaya": "Regional",
-        "pasuruan": "Regional",
-        "nganjuk": "Regional",
-        "trenggalek": "Regional",
+            if pattern.search(lead):
+                score += 1
 
-        "medan": "Regional",
-        "medan-terkini": "Regional",
-        "sumut-terkini": "Regional",
-        "deliserdang": "Regional",
-        "langkat": "Regional",
-        "binjai": "Regional",
-        "siantar": "Regional",
-        "tribun-medan-wiki": "Regional",
+        if score > best_score:
+            best_score = score
+            best_category = category
 
-        "makassar": "Regional",
-
-        "yogyakarta": "Regional",
-        "denpasar": "Regional",
-        "tapsel": "Regional",
-        "tapteng": "Regional",
-
-        "cek-fakta": "Fact Check",
-        "cekfakta": "Fact Check"
-    }
-
-    return mapping.get(category, category.title())
+    return best_category or "General Cybersecurity"
 
 
 def remove_duplicates(articles):
@@ -187,8 +126,8 @@ def remove_duplicates(articles):
 
         seen_urls.add(article.url)
 
-        article.category = normalize_category(
-            article.category
+        article.category = categorize_cybersecurity_topic(
+            article.title, article.content
         )
 
         unique_articles.append(article)
@@ -209,8 +148,8 @@ def print_statistics(articles):
             ) + 1
         )
 
-        category = normalize_category(
-            article.category
+        category = categorize_cybersecurity_topic(
+            article.title, article.content
         )
 
         category_counts[category] = (
@@ -264,8 +203,8 @@ def save_articles(
         data = asdict(article)
 
         data["category"] = (
-            normalize_category(
-                article.category
+            categorize_cybersecurity_topic(
+                article.title, article.content
             )
         )
 
@@ -318,8 +257,8 @@ def save_articles_csv(
                 article.title,
                 article.url,
                 article.source,
-                normalize_category(
-                    article.category
+                categorize_cybersecurity_topic(
+                    article.title, article.content
                 ),
                 article.published_date,
                 article.content

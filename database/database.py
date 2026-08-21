@@ -8,7 +8,7 @@ from infrastructure.postgresql_database import (
     initialize_database,
 )
 from repositories.article_repository import article_repository
-from services.article_service import normalize_category
+from services.article_service import categorize_cybersecurity_topic
 from services.sentiment_service import analyze_sentiment
 
 
@@ -39,7 +39,7 @@ def save_articles_to_database(articles):
                 article.title,
                 article.url,
                 article.source,
-                normalize_category(article.category),
+                categorize_cybersecurity_topic(article.title, article.content),
                 article.published_date,
                 article.crawl_date,
                 article.content,
