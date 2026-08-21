@@ -3,7 +3,6 @@ from config.sources import SOURCES
 from config.settings import (
     DATA_DIR,
     OUTPUT_FILE,
-    TOPIC_KEYWORDS,
     NEWS_TOPIC
 )
 
@@ -25,24 +24,6 @@ from database.database import (
 )
 
 from datetime import datetime, timedelta
-
-
-def is_topic_related(article):
-
-    text = (
-        f"{article.title} "
-        f"{article.content}"
-    ).lower()
-
-    keywords = TOPIC_KEYWORDS.get(
-        NEWS_TOPIC,
-        []
-    )
-
-    return any(
-        keyword.lower() in text
-        for keyword in keywords
-    )
 
 
 def main():
@@ -70,27 +51,12 @@ def main():
 
     print()
     print(
-        f"Total crawled before topic filter: "
+        f"Total verified {NEWS_TOPIC} articles: "
         f"{len(articles)}"
     )
 
-    # ========================================
-    # TOPIC FILTER
-    # ========================================
-
-    topic_articles = [
-        article
-        for article in articles
-        if is_topic_related(article)
-    ]
-
-    print(
-        f"Articles matching {NEWS_TOPIC}: "
-        f"{len(topic_articles)}"
-    )
-
     articles = remove_duplicates(
-        topic_articles
+        articles
     )
 
     # ========================================

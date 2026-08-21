@@ -1,32 +1,21 @@
 from config.settings import (
-    NEWS_TOPIC,
-    TOPIC_KEYWORDS
+    NEWS_TOPIC
+)
+
+from services.topic_verification_service import (
+    verify_article_topic
 )
 
 
 def is_topic_related(article):
     """
-    Check whether an article is related to the configured news topic.
-    Topic and keywords are controlled through config/settings.py.
+    Backwards-compatible boolean wrapper around the topic verifier.
     """
 
-    keywords = TOPIC_KEYWORDS.get(
-        NEWS_TOPIC,
-        []
-    )
-
-    if not keywords:
-        return True
-
-    text = (
-        f"{article.title} "
-        f"{article.content}"
-    ).lower()
-
-    return any(
-        keyword.lower() in text
-        for keyword in keywords
-    )
+    return verify_article_topic(
+        article,
+        NEWS_TOPIC
+    ).is_related
 
 
 def crawl_articles(
@@ -93,12 +82,22 @@ def crawl_articles(
 
                 continue
 
-            if not is_topic_related(article):
+            verification = verify_article_topic(
+                article,
+                NEWS_TOPIC
+            )
+
+            if not verification.is_related:
 
                 print(
                     f"[{source_name}] "
                     f"SKIPPED (not {NEWS_TOPIC}): "
                     f"{article.title}"
+                )
+
+                print(
+                    f"[{source_name}] "
+                    f"Verification: {verification.reason}"
                 )
 
                 continue
@@ -109,7 +108,12 @@ def crawl_articles(
 
             print(
                 f"[{source_name}] "
-                f"{article.title}"
+                f"VERIFIED: {article.title}"
+            )
+
+            print(
+                f"[{source_name}] "
+                f"Verification: {verification.reason}"
             )
 
         except Exception as e:
