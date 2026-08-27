@@ -103,6 +103,7 @@ def get_articles_with_sentiment(
         content = article[6] or ""
         sentiment = article[7] or "Neutral"
         confidence = article[8] if article[8] is not None else 0.0
+        sentiment_reason = article[9] or ""
 
         enriched_articles.append(
             {
@@ -114,6 +115,7 @@ def get_articles_with_sentiment(
                 "url": url,
                 "content": content,
                 "sentiment": sentiment,
+                "sentiment_reason": sentiment_reason,
                 "confidence": confidence
             }
         )
@@ -649,6 +651,7 @@ def get_latest_articles(
             "url": article["url"],
             "content": article["content"],
             "sentiment": article["sentiment"],
+            "sentiment_reason": article["sentiment_reason"],
             "confidence": article["confidence"]
         }
 

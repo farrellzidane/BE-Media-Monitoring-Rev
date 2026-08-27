@@ -13,7 +13,8 @@ ARTICLE_SELECT = """
         url,
         content,
         sentiment,
-        sentiment_confidence
+        sentiment_confidence,
+        sentiment_reason
     FROM articles
 """
 
@@ -36,9 +37,10 @@ class ArticleRepository:
                         crawl_date,
                         content,
                         sentiment,
-                        sentiment_confidence
+                        sentiment_confidence,
+                        sentiment_reason
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (url) DO UPDATE SET
                         title = EXCLUDED.title,
                         source = EXCLUDED.source,
@@ -47,7 +49,8 @@ class ArticleRepository:
                         crawl_date = EXCLUDED.crawl_date,
                         content = EXCLUDED.content,
                         sentiment = EXCLUDED.sentiment,
-                        sentiment_confidence = EXCLUDED.sentiment_confidence
+                        sentiment_confidence = EXCLUDED.sentiment_confidence,
+                        sentiment_reason = EXCLUDED.sentiment_reason
                     """,
                     records,
                 )

@@ -9,6 +9,7 @@ from infrastructure.postgresql_database import (
 )
 from repositories.article_repository import article_repository
 from services.article_service import categorize_cybersecurity_topic
+from services.sentiment_reason_service import generate_sentiment_reason
 from services.sentiment_service import analyze_sentiment
 
 
@@ -45,6 +46,9 @@ def save_articles_to_database(articles):
                 article.content,
                 sentiment["label"],
                 sentiment["confidence"],
+                generate_sentiment_reason(
+                    article.title, article.content, sentiment["label"]
+                ),
             )
         )
 
