@@ -28,6 +28,7 @@ ARTICLE_COLUMNS = (
     "content",
     "sentiment",
     "confidence",
+    "sentiment_reason",
 )
 
 

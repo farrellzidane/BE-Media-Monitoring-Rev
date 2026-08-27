@@ -2,7 +2,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from pathlib import Path
 
-MODEL_PATH = Path(__file__).resolve().parent / "saved_model"
+MODEL_PATH = (
+    Path(__file__).resolve().parent
+    / "saved_model_cybersecurity"
+)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

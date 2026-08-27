@@ -2,11 +2,19 @@ import os
 import json
 import time
 import re
+from pathlib import Path
 
 import pandas as pd
 
 from dotenv import load_dotenv
-from openai import OpenAI
+
+try:
+    from openai import OpenAI
+except ModuleNotFoundError as error:
+    raise RuntimeError(
+        "The 'openai' package is missing. Install dependencies with "
+        "'python -m pip install openai'."
+    ) from error
 
 
 # ======================================
@@ -39,11 +47,11 @@ client = OpenAI(
 
 MODEL = "qwen/qwen3.5-35b-a3b"
 
-INPUT_FILE = "ml/datasets/raw/cybersecurity_news.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-OUTPUT_FILE = (
-    "ml/datasets/labeled/cybersecurity_news_labeled.csv"
-)
+INPUT_FILE = PROJECT_ROOT / "ml/datasets/cybersecurity/raw.csv"
+
+OUTPUT_FILE = PROJECT_ROOT / "ml/datasets/cybersecurity/labeled.csv"
 
 
 # ======================================
@@ -292,6 +300,12 @@ def predict(title, content):
     response = client.chat.completions.create(
         model=MODEL,
         temperature=0,
+        max_tokens=1000,
+        extra_body={
+            "reasoning": {
+                "effort": "none"
+            }
+        },
         response_format={
             "type": "json_object"
         },
@@ -304,6 +318,12 @@ def predict(title, content):
     )
 
     text = response.choices[0].message.content
+
+    if not text:
+        raise RuntimeError(
+            "The model returned an empty response. "
+            "Increase max_tokens or try another model."
+        )
 
     print("\n========== MODEL RESPONSE ==========")
     print(text)
@@ -358,10 +378,13 @@ def predict(title, content):
 
 def main():
 
-    os.makedirs(
-        "ml/datasets/labeled",
-        exist_ok=True
-    )
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    if not INPUT_FILE.exists():
+        raise FileNotFoundError(
+            f"Cybersecurity raw dataset not found: {INPUT_FILE}. "
+            "Run export_raw.py first."
+        )
 
     df = pd.read_csv(
         INPUT_FILE

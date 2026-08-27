@@ -1,17 +1,59 @@
-import os
+from pathlib import Path
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-INPUT_FILE = "ml/datasets/labeled/cybersecurity_news_labeled.csv"
-OUTPUT_DIR = "ml/datasets/processed"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+INPUT_FILE = PROJECT_ROOT / "ml/datasets/cybersecurity/labeled.csv"
+OUTPUT_DIR = PROJECT_ROOT / "ml/datasets/cybersecurity"
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+if not INPUT_FILE.exists():
+    raise FileNotFoundError(
+        f"Cybersecurity labeled dataset not found: {INPUT_FILE}. "
+        "Run auto_labeler.py first."
+    )
 
 # ==========================
 # Load Dataset
 # ==========================
 
 df = pd.read_csv(INPUT_FILE)
+
+required_columns = {"title", "content", "category", "label"}
+missing_columns = required_columns - set(df.columns)
+if missing_columns:
+    raise ValueError(
+        f"Missing required columns: {sorted(missing_columns)}"
+    )
+
+cybersecurity_terms = (
+    "cyber", "siber", "ransomware", "malware", "phishing", "hacker",
+    "hacking", "data breach", "data leak", "kebocoran data", "peretasan",
+    "kerentanan", "exploit", "ddos", "keamanan jaringan",
+)
+cybersecurity_categories = {
+    "cybersecurity", "cyber security", "cybersec",
+    "malware & ransomware", "phishing & social engineering",
+    "data breach & leak", "hacking & cyber crime",
+    "vulnerability & exploit", "ddos & network attack",
+    "cyber espionage & warfare", "security technology & defense",
+    "policy & regulation", "general cybersecurity",
+}
+article_text = (
+    df["title"].fillna("").astype(str) + " " +
+    df["content"].fillna("").astype(str)
+).str.lower()
+is_cybersecurity = article_text.apply(
+    lambda text: any(term in text for term in cybersecurity_terms)
+)
+is_cybersecurity |= df["category"].fillna("").astype(str).str.strip().str.lower().isin(
+    cybersecurity_categories
+)
+df = df[is_cybersecurity].copy()
+if df.empty:
+    raise ValueError("No cybersecurity articles found in the labeled dataset")
 
 # ==========================
 # Combine title + content
@@ -55,13 +97,13 @@ train_df, valid_df = train_test_split(
 # ==========================
 
 train_df.to_csv(
-    f"{OUTPUT_DIR}/train.csv",
+    OUTPUT_DIR / "train.csv",
     index=False,
     encoding="utf-8-sig"
 )
 
 valid_df.to_csv(
-    f"{OUTPUT_DIR}/valid.csv",
+    OUTPUT_DIR / "valid.csv",
     index=False,
     encoding="utf-8-sig"
 )
@@ -81,5 +123,5 @@ print("\nValidation Label Distribution")
 print(valid_df["label"].value_counts())
 
 print("\nSaved:")
-print(f"{OUTPUT_DIR}/train.csv")
-print(f"{OUTPUT_DIR}/valid.csv")
+print(OUTPUT_DIR / "train.csv")
+print(OUTPUT_DIR / "valid.csv")

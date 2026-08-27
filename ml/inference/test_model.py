@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-model_path = "./ml/models/sentiment_model/checkpoint-1375"
+model_path = "./ml/models/saved_model_cybersecurity"
 
 classifier = pipeline(
     "text-classification",
@@ -9,11 +9,9 @@ classifier = pipeline(
 )
 
 samples = [
-    "IHSG anjlok akibat konflik perang global",
-    "Timnas Indonesia menang telak 3-0",
-    "Pemerintah bahas kebijakan ekonomi baru",
-    "Harga saham teknologi melemah hari ini",
-    "Jokowi bertemu investor asing di Jakarta"
+    "Apple merilis pembaruan keamanan untuk memperbaiki kerentanan kritis.",
+    "Data pelanggan bocor setelah sistem perusahaan diretas hacker.",
+    "Artikel menjelaskan pengertian phishing tanpa melaporkan insiden baru."
 ]
 
 for text in samples:

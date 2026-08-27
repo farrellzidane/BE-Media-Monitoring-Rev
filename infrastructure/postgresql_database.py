@@ -115,6 +115,7 @@ def initialize_database():
         # column is actually missing.
         _ensure_column(connection, "sentiment", "TEXT")
         _ensure_column(connection, "sentiment_confidence", "DOUBLE PRECISION")
+        _ensure_column(connection, "sentiment_reason", "TEXT")
 
 
 def _ensure_column(connection, column, column_type):

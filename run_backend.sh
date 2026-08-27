@@ -4,4 +4,4 @@ cd "$(dirname "$0")"
 set -a
 source .env
 set +a
-exec uvicorn api:app --reload
+exec uvicorn api:app
