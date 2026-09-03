@@ -2,18 +2,17 @@ import re
 
 from collections import Counter, defaultdict
 
-from config.settings import TOPIC_KEYWORDS
+from config.settings import NEWS_TOPIC, TOPIC_KEYWORDS
 from repositories.article_repository import article_repository
 from services.sentiment_reason_service import generate_sentiment_reason
 from services.sentiment_service import analyze_sentiment
 
 
-STOPWORDS = {
-    "yang", "dan", "untuk", "dengan", "dari", "pada", "yang", "yang", "ini",
-    "itu", "adalah", "akan", "setelah", "sebelum", "karena", "oleh", "bahwa",
-    "di", "ke", "ke", "juga", "sudah", "masih", "lebih", "bisa", "menjadi",
-    "saat", "tahun", "bulan", "hari", "menurut", "dalam", "terhadap", "atau",
-}
+# Longest phrase first so "cybersecurity firm" is counted instead of bare "cybersecurity".
+KEYWORD_PATTERNS = [
+    (keyword, re.compile(rf"\b{re.escape(keyword)}\b"))
+    for keyword in sorted(TOPIC_KEYWORDS[NEWS_TOPIC], key=len, reverse=True)
+]
 
 def _normalize_sentiment(value):
     if value is None:
@@ -208,20 +207,19 @@ def get_source_ranking(repository=None, enriched_articles=None):
 
 
 def get_top_keywords(keyword_limit=15, repository=None):
+    """Count mentions of the topic vocabulary only, so generic words never trend."""
     repository = repository or article_repository
     counts = Counter()
 
     for article in repository.get_all():
         data = _as_article_dict(article)
         text = f"{data.get('title') or ''} {data.get('content') or ''}".lower()
-        words = re.findall(r"[a-zA-Z0-9]+", text)
 
-        for word in words:
-            if len(word) <= 2:
-                continue
-            if word in STOPWORDS:
-                continue
-            counts[word] += 1
+        for keyword, pattern in KEYWORD_PATTERNS:
+            # Consume matches so a phrase is not counted again via its shorter parts.
+            text, hits = pattern.subn(" ", text)
+            if hits:
+                counts[keyword] += hits
 
     return counts.most_common(keyword_limit)
 

@@ -71,6 +71,32 @@ class AnalyticsServiceTests(unittest.TestCase):
         self.assertEqual(get_sentiment_trend(repository, enriched)["2026-07-20"]["positive"], 1)
         self.assertTrue(get_top_keywords(5, repository))
 
+    def test_top_keywords_only_returns_topic_vocabulary(self):
+        repository = FakeRepository([
+            (
+                "Serangan siber tersebut melanda 2026",
+                "Kompas",
+                "General Cybersecurity",
+                "2026-07-20",
+                "2026-07-20 08:00:00",
+                "https://example.com/a",
+                "Ransomware dan phishing tidak terdeteksi. Cybersecurity firm menyelidiki serangan siber itu.",
+                "Negative",
+                0.9,
+                None,
+            ),
+        ])
+
+        counts = dict(get_top_keywords(20, repository))
+
+        self.assertEqual(counts["serangan siber"], 2)
+        self.assertEqual(counts["ransomware"], 1)
+        self.assertEqual(counts["cybersecurity firm"], 1)
+        # generic words and sub-phrases of a longer match never trend
+        self.assertNotIn("tersebut", counts)
+        self.assertNotIn("2026", counts)
+        self.assertNotIn("cybersecurity", counts)
+
 
 if __name__ == "__main__":
     unittest.main()
