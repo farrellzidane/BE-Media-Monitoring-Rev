@@ -3,9 +3,8 @@ from ml.models.predict import predict
 
 def analyze_sentiment(text):
     """
-    Analyze sentiment using the cybersecurity-focused model without forcing a
-    synthetic score. The confidence returned here should reflect the model's
-    actual prediction strength.
+    Analyze sentiment using the trained sentiment model. The confidence
+    returned here reflects the model's actual prediction strength.
     """
 
     if not text:
