@@ -4,4 +4,4 @@ cd "$(dirname "$0")"
 set -a
 source .env
 set +a
-exec python main.py
+exec python3 main.py
