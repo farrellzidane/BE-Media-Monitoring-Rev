@@ -1,0 +1,119 @@
+﻿text,label,label_id
+Survei Mengukur Penggunaan Autentikasi Multifaktor. Survei nasional mencatat kebiasaan organisasi dalam menggunakan autentikasi multifaktor.,Neutral,1
+"Fitur Baru ChatGPT Bisa Lacak Setiap Ketikan Pengguna, Apa Berbahaya?. Fitur bernama Computer History membantu ChatGPT mempelajari kebiasaan kerja pengguna, menyelesaikan tugas yang belum selesai, dan lain sebagainya.
+Liputan6.com, Jakarta - OpenAI memperkenalkan fitur baru milik ChatGPT pada aplikasi desktop di macOS yang dapat mendeteksi setiap klik, ketukan tombol, dan lainnya. Semua ini demi melatih model kecerdasan buatan ( Artificial Intelligence / AI ) mereka.
+Fitur bernama Computer History membantu ChatGPT mempelajari kebiasaan kerja pengguna, menyelesaikan tugas yang belum selesai, serta memberi saran keterampilan dan otomatisasi.
+Dilansir Futurism , Selasa (18/8/2026), dalam sebuah video, Dominik Kundel dari OpenAI menunjukkan ChatGPT bisa menyebutkan judul dokumen Google Doc yang terakhir dilihat. Bahkan, dapat mengecek apakah dokumen tersebut pernah dibagikan di grup obrolan.
+Advertisement
+Hal ini membuktikan AI memiliki akses mendalam ke kehidupan digital pengguna, sehingga bisa mengetahui pesan mana yang perlu diperiksa, dan menelusuri riwayat percakapan Slack milik Kundel.
+Perusahaan AI asal San Francisco ini menegaskan fitur Computer History bersifat opt-in, yaitu memerlukan persetujuan pengguna untuk mengaktifkannya dan bukan opt-out, yaitu aktif secara otomatis.
+Fitur tersebut dapat secara otomatis mengabaikan konten apapun pada mode penyamaran atau dari tab browser pribadi. Weinstein mengatakan pengguna bisa secara manual memasukkan aplikasi ke daftar hitam agar tidak dilacak.
+Selain itu, pengguna juga dapat menghapus memori aktivitas yang tersimpan dalam basis data sistem.
+Meskipun demikian, memberikan akses sebesar itu kepada model AI merupakan hal besar. Meskipun pengguna dapat memilih perizinan akses, rekan bicara dalam obrolan tidak bisa melakukan hal serupa.
+Banyak pengguna di media sosial menyebut fitur ini mengerikan dan membandingkan dengan fitur Windows Recall milik Microsoft yang sebelumnya dikecam terkait masalah keamanan data.
+Berbeda dengan Recall yang berfokus mengambil tangkapan layar, Computer History mengandalkan interaksi secara real-time .
+Perusahaan memperingatkan berkas Computer History ini berisi informasi sensitif dan tidak dienkripsi. Hal ini berarti membuka celah aplikasi lain dengan hak izin macOS pengguna untuk dapat mengaksesnya.
+Advertisement
+Advertisement
+Advertisement
+Advertisement
+Copyright © 2026 Liputan6.com
+KLY KapanLagi Youniverse All Right Reserved.",Negative,0
+"WhatsApp Rilis Fitur Anti Phishing, Seberapa Kuat?. WhatsApp memperbaharui fitur pengamanan akun demi menghindari phishing. Apa saja fitur yang dimaksud?
+Liputan6.com, Jakarta - WhatsApp menghadirkan sejumlah fitur baru untuk memperkuat keamanan akun pengguna. Pembaruan tersebut terjadi pada perlindungan saat akun didaftarkan kembali hingga keamanan ketika menerima panggilan dari nomor asing.
+Dikutip dari CNET , Rabu (26/8/2026), WhatsApp memperbarui sistem two-step verification dan mendukungan beberapa passkey dalam satu akun. Aplikasi ini juga memberikan informasi tambahan untuk panggilan dari nomor yang tidak dikenal.
+Salah satu perubahan utama terdapat pada two-step verification . Sebelumnya, pengguna harus membuat PIN enam digit sebagai lapisan keamanan tambahan.
+Advertisement
+Kini, PIN dapat diganti dengan kata sandi yang lebih panjang. Pengguna dapat memasukkan kombinasi huruf, angka, dan karakter khusus sehingga lebih sulit ditebak.
+Fitur ini dirancang untuk membantu mencegah akun diambil alih, termasuk ketika seseorang berhasil memperoleh kode sekali pakai milik pengguna.
+WhatsApp juga memperluas penggunaan passkey . Pengguna kini dapat menyimpan lebih dari satu passkey pada akun yang sama.
+Fitur ini berguna bagi pengguna yang memiliki lebih dari satu perangkat. Mereka dapat menggunakan metode autentikasi seperti sidik jari, Face ID, atau kunci layar perangkat untuk masuk kembali ke akun.
+WhatsApp menunjukan lebih dari satu miliar orang telah menggunakan passkey untuk mengamankan akun mereka. Teknologi tersebut memungkinkan proses masuk dilakukan tanpa mengandalkan kata sandi konvensional yang rentan terhadap phishing .
+Selain itu, pengguna Android akan memperoleh informasi lebih lengkap saat menerima panggilan dari nomor yang belum tersimpan di kontak.
+WhatsApp dapat menunjukkan negara asal nomor dan apakah penelepon memiliki grup yang sama dengan pengguna.
+Informasi ini diharapkan membantu pengguna menilai panggilan asing sebelum memutuskan untuk menjawabnya.
+Dengan tiga pembaruan itu, WhatsApp berupaya membuat perlindungan akun lebih kuat sekaligus lebih mudah digunakan.
+Advertisement
+Advertisement
+Advertisement
+Advertisement
+Copyright © 2026 Liputan6.com
+KLY KapanLagi Youniverse All Right Reserved.",Positive,2
+Patch Otomatis Melindungi Perangkat. Perangkat menerima patch keamanan otomatis segera setelah vendor merilis perbaikan kerentanan.,Positive,2
+Situs Layanan Mengalami Defacement. Peretas mengganti halaman layanan dengan pesan propaganda setelah memperoleh akses ke server web.,Negative,0
+Komunitas Menutup Celah pada Proyek Open Source. Pengelola proyek menerima laporan keamanan dan merilis perbaikan untuk seluruh pengguna.,Positive,2
+Celah Kritis Membuka Akses ke Server. Celah keamanan pada aplikasi publik memungkinkan penyerang menjalankan kode tanpa autentikasi.,Negative,0
+"Universitas Membuka Mata Kuliah Keamanan Siber. Universitas mengumumkan mata kuliah baru mengenai jaringan aman, privasi, dan respons insiden.",Neutral,1
+Artikel Menjelaskan Perbedaan Virus dan Worm. Artikel edukasi menjelaskan perbedaan virus komputer dan worm tanpa melaporkan serangan tertentu.,Neutral,1
+Tim Tanggap Insiden Mengamankan Infrastruktur. Tim tanggap insiden mengisolasi perangkat terinfeksi dan mengembalikan layanan secara aman.,Positive,2
+"Apa Itu Grow AI? Platform yang Diklaim Dorong UMKM Naik Kelas?. Grow AI memadukan infrastruktur cloud, keamanan siber, hingga otomasi dalam satu ekosistem terintegrasi.
+Liputan6.com, Jakarta - Penyedia solusi web hosting , Exabytes , baru saja memperkenalkan arah strategis terbarunya, beralih dari 'Grow Digital' menjadi ' Grow AI '.
+Inisiatif yang diumumkan dalam ajang Grow AI Summit 2026 di Kuala Lumpur, Malaysia, ini menegaskan komitmen Exabytes untuk mendampingi Usaha Mikro, Kecil, dan Menengah (UMKM) serta pelaku usaha nasional mengadopsi kecerdasan buatan secara praktis, aman, dan terukur.
+Langkah strategis ini menjadi bagian dari misi besar Exabytes memberdayakan satu juta bisnis berbasis AI hingga 2030.
+Advertisement
+Lantas, apa itu Grow AI? Konsep ini dirancang untuk mendorong dunia bisnis bergerak melampaui sekadar kehadiran digital menuju operasional yang dipacu oleh AI secara efisien.
+Grow AI memadukan infrastruktur cloud , keamanan siber, aplikasi bisnis, e-commerce , produktivitas kerja, otomasi, hingga layanan managed AI dalam satu ekosistem terintegrasi.
+Berlandaskan prinsip RASA (Reliable, Accessible, Scalable, AI-driven), strategi ini mengubah AI dari sekadar tren teknologi menjadi dapur pacu pertumbuhan bisnis yang terukur.
+Pendiri sekaligus Chief Executive Officer Exabytes Group, Chan Kee Siak, menegaskan transformasi menuju Grow AI merupakan langkah alami dari perjalanan 25 tahun perusahaan mendampingi pelaku usaha.
+""Selama 25 tahun beroperasi, Exabytes telah mendukung lebih dari 160.000 bisnis. Dengan adopsi AI dan strategi baru ini, kami menetapkan target besar untuk membantu lebih banyak bisnis bertumbuh melalui AI,"" ujarnya, dikutip Kamis (20/8/2026).
+Ia menambahkan, Exabytes hadir untuk menyederhanakan kompleksitas AI agar para pelaku usaha tidak ragu dan dapat menerapkannya secara aman dengan hasil yang nyata.
+Bagi Indonesia, salah satu dari tiga pasar inti Exabytes selain Malaysia dan Singapura, inisiatif ini memiliki arti yang amat vital.
+Dengan lebih dari 65 juta UMKM yang menyumbang sekitar 60 persen terhadap Produk Domestik Bruto (PDB) nasional, percepatan adopsi AI menjadi kunci utama peningkatan daya saing ekonomi digital Indonesia.
+Kehadiran Grow AI diharapkan mampu mengatasi tantangan keterbatasan literasi digital dan kesenjangan infrastruktur yang kerap dihadapi UMKM di tanah air.
+VP & Country Manager Exabytes Indonesia, Indra Hartawan, menyatakan bahwa Grow AI merupakan komitmen nyata Exabytes dalam mendampingi bisnis lokal menjawab tantangan era modern.
+Melalui solusi berbasis AI, pihaknya optimistis dapat mendorong efisiensi operasional sekaligus meningkatkan produktivitas tenaga kerja bisnis di Indonesia.
+Sebagai bentuk konkret dari arah baru ini, Exabytes bersiap meluncurkan rangkaian produk berbasis AI dalam waktu dekat.
+Solusi yang ditawarkan mencakup asisten layanan pelanggan, optimalisasi penjualan dan pemasaran berbasis AI, otomasi alur kerja, hingga infrastruktur AI yang fleksibel untuk membantu UMKM Indonesia bertransformasi secara bertahap dan terukur.
+Advertisement
+Advertisement
+Advertisement
+Advertisement
+Copyright © 2026 Liputan6.com
+KLY KapanLagi Youniverse All Right Reserved.",Positive,2
+Penipu Mengambil Alih Akun Perbankan. Beberapa korban kehilangan akses akun setelah memberikan kode OTP kepada pelaku melalui pesan palsu.,Negative,0
+Tim Siber Memulihkan Layanan dengan Aman. Tim tanggap insiden memulihkan layanan dari cadangan bersih setelah melakukan pemeriksaan menyeluruh.,Positive,2
+Serangan Trojan Mencuri Kata Sandi. Trojan yang terpasang pada komputer pengguna merekam kata sandi dan mengirimkannya ke server pelaku.,Negative,0
+Platform Menambahkan Pemindaian Tautan Berbahaya. Platform baru memindai tautan masuk dan memperingatkan pengguna sebelum halaman berbahaya dibuka.,Positive,2
+"Hati-Hati Dapat Missed Call dari Nomor Ini, Jangan Telepon Balik!. Jakarta, CNBC Indonesia - Pernah menerima panggilan telepon dari nomor asing yang hanya berdering sekali lalu mati? Waspada, bisa jadi Anda sedang menjadi target modus penipuan wangiri.
+Istilah wangiri berasal dari bahasa Jepang yang berarti ""sekali dering dan tutup"". Modus kejahatan siber yang sejatinya sudah ada sejak tahun 2000-an ini memanfaatkan rasa penasaran korban untuk menelepon kembali (call back) panggilan tak terjawab (missed call) dari nomor tak dikenal, terutama yang menggunakan kode area luar negeri.
+Kerugian Berlapis: Pulsa Ludes hingga Kebocoran Data
+Kementerian Komunikasi dan Digital (Komdigi), yang sebelumnya bernama Kemenkominfo, mencatat kasus serupa pernah marak menghantam pelanggan operator seluler di Indonesia dengan maraknya panggilan ber-kode area +77.
+Sedot Pulsa Otomatis: Saat Anda menelepon balik, panggilan tersebut akan terhitung sebagai panggilan internasional bertarif fantastis.
+Biaya Layanan Premium: Jika nomor yang dihubungi terhubung ke layanan premium, korbannya akan dikenakan tarif eksorbitan yang keuntungannya langsung mengalir ke kantong penipu.
+Eksploitasi Data Pribadi: Selain kerugian finansial, nomor telepon korban berisiko dicatat dan diperjualbelikan ke jaringan kejahatan siber global.
+Untuk menghindari jebakan wangiri, perhatikan langkah-langkah proteksi berikut:
+Cek Kode Negara: Selalu periksa awalan nomor pada panggilan tak terjawab. Indonesia menggunakan kode +62, sementara nomor mencurigakan biasanya menggunakan kode negara asing seperti Kongo (+24) atau wilayah lainnya.
+Jangan Panggil Balik: Jika Anda tidak mengenali nomor internasional tersebut dan tidak sedang menunggu panggilan dari luar negeri, abaikan dan jangan pernah menelepon balik.
+Penelusuran Mandiri: Bila terlanjur penasaran, cari tahu informasi atau identitas pemilik nomor tersebut terlebih dahulu melalui mesin pencari atau aplikasi pelacak nomor telepon sebelum mengambil tindakan.",Negative,0
+Aplikasi Menambahkan Verifikasi Dua Langkah. Pembaruan aplikasi menambahkan verifikasi dua langkah untuk melindungi akun dari pengambilalihan.,Positive,2
+"Serangan Diam-Diam Bikin Negara Lumpuh 4 Hari Penuh. Jakarta, CNBC Indonesia - Inggris menjadi korban serangan siber kelompok terkait dengan Iran bulan lalu. Kejadian itu membuat pembangkit listrik harus ditutup sementara selama empat hari.
+Pemerintah Inggris mengatakan insiden peretasan melibatkan generator energi skala kecil. Negara itu juga memastikan sistem energinya tangguh dan tidak ada risiko yang lebih luas.
+""Berita ini merujuk pada insiden yang berdampak pada pembangkit energi skala kecil dan tidak berisiko pada sistem energi yang lebih luas,"" kata juru bicara Departemen Keamanan Energi dan Net Zero, dikutip dari The Guardian , Senin (24/8/2026).
+""Inggris memiliki sistem energi yang tangguh. Kami bekerja sama erat dengan sektor energi untuk melindungi infrastruktur dan memastikan standar keamanan tinggi,"" imbuhnya.
+Pusat Keamanan Siber Nasional (NCSC) juga mengatakan belum mendapatkan laporan adanya gangguan dari operator pembangkit listrik yang terdampak.
+Insiden peretasan ini disebut partai Konservatif setempat sebagai jenis peperangan baru. Inggris perlu memprioritaskan adanya keandalan dan keamanan sistem energi.
+Juru bicara partai, Claire Coutinho juga menyoroti negara yang bergantung pada impor gas dan listrik. Karena hal ini menjadi salah satu penyebab Inggris menjadi lebih rentan.
+""Dengan bergantung pada impor gas dan listrik serta gagal membangun pembangkit gas atau nuklir yang cukup andal sebagai cadangan dalam negeri, kita jadi lebih rentan,"" dia menambahkan.
+Iran telah mengingatkan target sasarannya adalah pangkalan yang digunakan oleh Amerika Serikat (AS). Inggris diketahui mengizinkan AS melancarkan serangan apapun dari pangkalan di negara tersebut.
+Terkait ancaman tersebut, Inggris menegaskan siap membela diri.",Negative,0
+"Airlangga Target IEU-CEPA Ditekan Oktober 2026, Ini Manfaatnya Buat RI. Jakarta, CNBC Indonesia - Menteri Koordinator Bidang Perekonomian Airlangga Hartarto menargetkan perjanjian dagang Indonesia-Uni Eropa atau Indonesia-European Union Comprehensive Economic Partnership Agreement (IEU-CEPA) dapat ditandatangani pada Oktober 2026.
+Airlangga mengatakan proses penyelesaian dokumen IEU-CEPA versi bahasa Inggris kini memasuki tahap akhir. Setelah ditandatangani, perjanjian tersebut akan dibawa ke Parlemen Uni Eropa untuk menjalani proses ratifikasi.
+""Dokumentasi dalam versi bahasa Inggris sudah segera diselesaikan dan ditargetkan di bulan Oktober. Mudah-mudahan ini bisa ditandatangani dan sesudah ditandatangani akan dibawa ke Parlemen EU (Uni Eropa) untuk mendapatkan ratifikasi,"" kata Airlangga dalam konferensi pers di kantornya, dikutip Senin (24/8/2026).
+Di dalam negeri, Airlangga mengatakan Menteri Perdagangan Budi Santoso telah berkonsultasi dengan DPR terkait mekanisme ratifikasi IEU-CEPA.
+Menurutnya, hasil konsultasi tersebut mengarah pada penggunaan mekanisme Peraturan Presiden (Perpres) untuk mengesahkan perjanjian dagang tersebut. Langkah itu dinilai dapat mempercepat implementasi IEU-CEPA setelah proses penandatanganan selesai.
+Airlangga optimistis IEU-CEPA akan memberikan manfaat besar bagi hubungan ekonomi Indonesia dan Uni Eropa, terutama melalui peningkatan akses pasar bagi produk-produk Indonesia.
+Salah satu manfaat utama yang diperoleh Indonesia adalah penghapusan tarif bea masuk untuk sebagian besar produk ekspor ke kawasan Eropa.
+""Beberapa manfaat dari akses pasar, di mana Indonesia nanti 90% tarifnya langsung menjadi 0% dan ini akan berkurang secara bertahap,"" ujar Airlangga.
+Untuk memastikan implementasi perjanjian berjalan efektif, Indonesia dan Uni Eropa juga sepakat membentuk joint task force . Tim bersama ini akan bertugas mengidentifikasi berbagai persoalan implementasi, baik yang berkaitan dengan investasi maupun kegiatan usaha dari kedua belah pihak.
+Selain melakukan identifikasi, joint task force tersebut juga akan mencari solusi atas berbagai hambatan yang dihadapi pelaku usaha dan pemangku kepentingan dari Indonesia maupun Uni Eropa.
+Airlangga mengungkapkan Uni Eropa memiliki minat yang besar untuk meningkatkan investasi di sejumlah sektor strategis di Indonesia.
+""Kalau sektor kita sudah bahas banyak, renewable energy , digital, cyber security , kemudian juga beberapa sektor lain, agriculture itu juga menjadi hal yang menjadi perhatian kedua negara,"" ujarnya.
+Selain energi terbarukan, digital, keamanan siber, dan pertanian, negara-negara Uni Eropa juga disebut tertarik berinvestasi di sektor kesehatan, hilirisasi industri, mineral kritis, serta perikanan.",Neutral,1
+Peneliti Menerbitkan Taksonomi Ancaman. Publikasi baru mengusulkan taksonomi untuk mengelompokkan ancaman terhadap layanan digital.,Neutral,1
+"Kamus Keamanan Digital Menambahkan Istilah Baru. Kamus daring memperbarui definisi istilah phishing, vishing, dan autentikasi adaptif.",Neutral,1
+Perangkat Karyawan Terinfeksi Spyware. Spyware memantau aktivitas perangkat kerja dan mengirimkan tangkapan layar ke operatornya.,Negative,0
+Serangan Supply Chain Menyebarkan Kode Berbahaya. Pembaruan perangkat lunak pihak ketiga membawa kode berbahaya ke sejumlah sistem pelanggan.,Negative,0
+Sistem Rumah Sakit Terkena Serangan Siber. Serangan siber memaksa rumah sakit menunda sejumlah pemeriksaan karena sistem rekam medis tidak tersedia.,Negative,0
+Webinar Membahas Perlindungan Privasi. Webinar bulan ini akan membahas dasar perlindungan privasi dan pengelolaan izin aplikasi.,Neutral,1
+Aplikasi Mengaktifkan Enkripsi End-to-End. Versi terbaru aplikasi melindungi pesan dengan enkripsi end-to-end secara default.,Positive,2
+Acara Komunitas Menampilkan Praktik Keamanan. Acara komunitas bulan depan akan menampilkan presentasi praktik keamanan untuk pengembang perangkat lunak.,Neutral,1

@@ -13,4 +13,5 @@ venv/
 .env
 
 ml/models/saved_model_backup*/
+ml/models/saved_model_cybersecurity_retrained/
 ml/models/*.zip

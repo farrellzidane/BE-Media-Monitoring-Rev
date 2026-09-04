@@ -4,6 +4,7 @@ import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 MODEL_CANDIDATES = [
+    Path(__file__).resolve().parent / "saved_model_cybersecurity_retrained",
     Path(__file__).resolve().parent / "saved_model_cybersecurity",
     Path(__file__).resolve().parent / "saved_model",
     Path(__file__).resolve().parent / "saved_model_backup2",
@@ -20,6 +21,18 @@ for candidate in MODEL_CANDIDATES:
     ):
         MODEL_PATH = candidate
         break
+
+if MODEL_PATH is not None:
+    import json
+
+    with (MODEL_PATH / "config.json").open(encoding="utf-8") as config_file:
+        model_config = json.load(config_file)
+    configured_labels = len(model_config.get("id2label", {}))
+    if configured_labels != 3:
+        raise RuntimeError(
+            f"Invalid sentiment model at {MODEL_PATH}: expected 3 labels, "
+            f"found {configured_labels}"
+        )
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

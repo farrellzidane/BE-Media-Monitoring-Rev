@@ -55,6 +55,15 @@ df = df[is_cybersecurity].copy()
 if df.empty:
     raise ValueError("No cybersecurity articles found in the labeled dataset")
 
+df["label"] = df["label"].astype(str).str.strip().str.title()
+df = df[df["label"].isin({"Negative", "Neutral", "Positive"})].copy()
+df["dedupe_key"] = (
+    df["title"].fillna("").astype(str).str.strip().str.lower()
+    + "|"
+    + df["content"].fillna("").astype(str).str.strip().str.lower()
+)
+df = df.drop_duplicates(subset=["dedupe_key"]).drop(columns=["dedupe_key"])
+
 # ==========================
 # Combine title + content
 # ==========================
@@ -84,12 +93,19 @@ df = df[["text", "label", "label_id"]]
 # Train / Validation Split
 # ==========================
 
-train_df, valid_df = train_test_split(
+train_df, remainder_df = train_test_split(
     df,
-    test_size=0.2,
+    test_size=0.3,
     random_state=42,
     shuffle=True,
     stratify=df["label"]
+)
+valid_df, test_df = train_test_split(
+    remainder_df,
+    test_size=0.5,
+    random_state=42,
+    shuffle=True,
+    stratify=remainder_df["label"],
 )
 
 # ==========================
@@ -108,6 +124,12 @@ valid_df.to_csv(
     encoding="utf-8-sig"
 )
 
+test_df.to_csv(
+    OUTPUT_DIR / "test.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
+
 print("=" * 60)
 print("Dataset Preparation Finished")
 print("=" * 60)
@@ -115,6 +137,7 @@ print("=" * 60)
 print(f"Total Data      : {len(df)}")
 print(f"Training Data   : {len(train_df)}")
 print(f"Validation Data : {len(valid_df)}")
+print(f"Test Data       : {len(test_df)}")
 
 print("\nTraining Label Distribution")
 print(train_df["label"].value_counts())
@@ -122,6 +145,10 @@ print(train_df["label"].value_counts())
 print("\nValidation Label Distribution")
 print(valid_df["label"].value_counts())
 
+print("\nTest Label Distribution")
+print(test_df["label"].value_counts())
+
 print("\nSaved:")
 print(OUTPUT_DIR / "train.csv")
 print(OUTPUT_DIR / "valid.csv")
+print(OUTPUT_DIR / "test.csv")
