@@ -29,6 +29,10 @@ ARTICLE_COLUMNS = (
     "sentiment",
     "confidence",
     "sentiment_reason",
+    "confidence_reason",
+    "score_negative",
+    "score_neutral",
+    "score_positive",
 )
 
 

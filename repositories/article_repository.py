@@ -14,7 +14,11 @@ ARTICLE_SELECT = """
         content,
         sentiment,
         sentiment_confidence,
-        sentiment_reason
+        sentiment_reason,
+        confidence_reason,
+        sentiment_score_negative,
+        sentiment_score_neutral,
+        sentiment_score_positive
     FROM articles
 """
 
@@ -38,9 +42,13 @@ class ArticleRepository:
                         content,
                         sentiment,
                         sentiment_confidence,
-                        sentiment_reason
+                        sentiment_reason,
+                        confidence_reason,
+                        sentiment_score_negative,
+                        sentiment_score_neutral,
+                        sentiment_score_positive
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (url) DO UPDATE SET
                         title = EXCLUDED.title,
                         source = EXCLUDED.source,
@@ -50,7 +58,11 @@ class ArticleRepository:
                         content = EXCLUDED.content,
                         sentiment = EXCLUDED.sentiment,
                         sentiment_confidence = EXCLUDED.sentiment_confidence,
-                        sentiment_reason = EXCLUDED.sentiment_reason
+                        sentiment_reason = EXCLUDED.sentiment_reason,
+                        confidence_reason = EXCLUDED.confidence_reason,
+                        sentiment_score_negative = EXCLUDED.sentiment_score_negative,
+                        sentiment_score_neutral = EXCLUDED.sentiment_score_neutral,
+                        sentiment_score_positive = EXCLUDED.sentiment_score_positive
                     """,
                     records,
                 )

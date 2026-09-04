@@ -4,7 +4,10 @@ from collections import Counter, defaultdict
 
 from config.settings import NEWS_TOPIC, TOPIC_KEYWORDS
 from repositories.article_repository import article_repository
-from services.sentiment_reason_service import generate_sentiment_reason
+from services.sentiment_reason_service import (
+    generate_confidence_reason,
+    generate_sentiment_reason,
+)
 from services.sentiment_service import analyze_sentiment
 
 
@@ -39,10 +42,14 @@ def _as_article_dict(article):
             "sentiment": article.get("sentiment"),
             "confidence": article.get("confidence"),
             "sentiment_reason": article.get("sentiment_reason"),
+            "confidence_reason": article.get("confidence_reason"),
+            "score_negative": article.get("score_negative"),
+            "score_neutral": article.get("score_neutral"),
+            "score_positive": article.get("score_positive"),
         }
 
     values = list(article)
-    while len(values) < 10:
+    while len(values) < 14:
         values.append(None)
 
     return {
@@ -56,6 +63,10 @@ def _as_article_dict(article):
         "sentiment": values[7],
         "confidence": values[8],
         "sentiment_reason": values[9],
+        "confidence_reason": values[10],
+        "score_negative": values[11],
+        "score_neutral": values[12],
+        "score_positive": values[13],
     }
 
 
@@ -100,15 +111,29 @@ def get_articles_with_sentiment(repository=None):
         except (TypeError, ValueError):
             confidence = 0.0
 
+        scores = {
+            "Negative": record["score_negative"],
+            "Neutral": record["score_neutral"],
+            "Positive": record["score_positive"],
+        }
+        if not any(value is not None for value in scores.values()):
+            scores = None
+
         if record["sentiment"] in (None, ""):
             prediction = analyze_sentiment(_article_text(record))
             sentiment = _normalize_sentiment(prediction.get("label"))
             confidence = float(prediction.get("confidence", 0.0) or 0.0)
+            scores = prediction.get("scores")
 
         reason = record["sentiment_reason"] or generate_sentiment_reason(
             title,
             content,
             sentiment,
+        )
+        confidence_reason = record["confidence_reason"] or generate_confidence_reason(
+            sentiment,
+            confidence,
+            scores,
         )
 
         enriched.append(
@@ -123,6 +148,10 @@ def get_articles_with_sentiment(repository=None):
                 "sentiment": sentiment,
                 "confidence": confidence,
                 "sentiment_reason": reason,
+                "confidence_reason": confidence_reason,
+                "score_negative": (scores or {}).get("Negative"),
+                "score_neutral": (scores or {}).get("Neutral"),
+                "score_positive": (scores or {}).get("Positive"),
             }
         )
 

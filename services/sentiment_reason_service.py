@@ -88,3 +88,41 @@ def generate_sentiment_reason(title, content, label):
         "maupun negatif yang dominan terhadap keamanan siber; artikel "
         "bersifat informatif atau deskriptif."
     )
+
+
+def generate_confidence_reason(label, confidence, scores):
+    """Return a short rationale for the model's confidence score, based on
+    the margin between the winning label's probability and the runner-up.
+    A wide margin means the model saw little competing evidence for other
+    labels; a narrow margin means the article reads as ambiguous."""
+
+    confidence = float(confidence or 0.0)
+    scores = scores or {}
+    top_score = float(scores.get(label, confidence) or confidence)
+    runner_up_label, runner_up_score = max(
+        ((other_label, float(score or 0.0))
+         for other_label, score in scores.items()
+         if other_label != label),
+        key=lambda pair: pair[1],
+        default=(None, 0.0),
+    )
+    margin = top_score - runner_up_score
+
+    if not scores or runner_up_label is None:
+        return (
+            f"Skor {top_score * 100:.0f}% dihasilkan tanpa pembanding label "
+            "lain yang tersedia."
+        )
+
+    if margin >= 0.5:
+        certainty = "Keyakinan tinggi"
+    elif margin >= 0.2:
+        certainty = "Keyakinan sedang"
+    else:
+        certainty = "Keyakinan rendah"
+
+    return (
+        f"{certainty}: skor {label} ({top_score * 100:.0f}%) "
+        f"{'jauh melampaui' if margin >= 0.2 else 'hanya sedikit di atas'} "
+        f"{runner_up_label} ({runner_up_score * 100:.0f}%)."
+    )

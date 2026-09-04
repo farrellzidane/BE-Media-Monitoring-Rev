@@ -116,6 +116,10 @@ def initialize_database():
         _ensure_column(connection, "sentiment", "TEXT")
         _ensure_column(connection, "sentiment_confidence", "DOUBLE PRECISION")
         _ensure_column(connection, "sentiment_reason", "TEXT")
+        _ensure_column(connection, "confidence_reason", "TEXT")
+        _ensure_column(connection, "sentiment_score_negative", "DOUBLE PRECISION")
+        _ensure_column(connection, "sentiment_score_neutral", "DOUBLE PRECISION")
+        _ensure_column(connection, "sentiment_score_positive", "DOUBLE PRECISION")
 
 
 def _ensure_column(connection, column, column_type):
