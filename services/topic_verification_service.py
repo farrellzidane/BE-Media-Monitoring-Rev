@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from config.settings import NEWS_TOPIC, TOPIC_KEYWORDS
+from services.settings_service import get_enabled_keywords
 
 
 # Some crawlers collect every paragraph on the page, including recommendations
@@ -106,10 +107,10 @@ def _format_keywords(keywords):
 def verify_article_topic(article, topic=NEWS_TOPIC):
     """Return an explainable topic-verification result for an article."""
 
-    keywords = tuple(
-        keyword.lower()
-        for keyword in TOPIC_KEYWORDS.get(topic, ())
-    )
+    configured_keywords = list(TOPIC_KEYWORDS.get(topic, ()))
+    if topic == "cybersecurity":
+        configured_keywords.extend(get_enabled_keywords())
+    keywords = tuple(keyword.lower() for keyword in dict.fromkeys(configured_keywords))
 
     if not keywords:
         return TopicVerification(

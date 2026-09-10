@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 INPUT_FILE = PROJECT_ROOT / "ml/datasets/cybersecurity/labeled.csv"
+NEUTRAL_EXAMPLES_FILE = PROJECT_ROOT / "ml/datasets/cybersecurity/neutral_informational.csv"
 OUTPUT_DIR = PROJECT_ROOT / "ml/datasets/cybersecurity"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -20,6 +21,8 @@ if not INPUT_FILE.exists():
 # ==========================
 
 df = pd.read_csv(INPUT_FILE)
+if NEUTRAL_EXAMPLES_FILE.exists():
+    df = pd.concat([df, pd.read_csv(NEUTRAL_EXAMPLES_FILE)], ignore_index=True)
 
 required_columns = {"title", "content", "category", "label"}
 missing_columns = required_columns - set(df.columns)

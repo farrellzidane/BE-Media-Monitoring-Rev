@@ -6,6 +6,8 @@ from services.topic_verification_service import (
     verify_article_topic
 )
 
+from crawler.generic import _is_placeholder_title
+
 
 def is_topic_related(article):
     """
@@ -80,6 +82,10 @@ def crawl_articles(
                 )
                 print()
 
+                continue
+
+            if _is_placeholder_title(article.title):
+                print(f"[{source_name}] SKIPPED placeholder headline: {url}")
                 continue
 
             verification = verify_article_topic(

@@ -33,6 +33,7 @@ ARTICLE_COLUMNS = (
     "score_negative",
     "score_neutral",
     "score_positive",
+    "sentiment_override",
 )
 
 
@@ -81,6 +82,10 @@ class MonitoringService:
             ),
             "articles": enriched_articles,
         }
+
+    def update_sentiment(self, url, sentiment):
+        labels = {"positive": "Positive", "neutral": "Neutral", "negative": "Negative"}
+        return self.repository.update_sentiment(url, labels[sentiment])
 
     def get_quality_rule_evidence(
         self,

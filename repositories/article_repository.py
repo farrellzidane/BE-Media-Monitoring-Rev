@@ -18,7 +18,8 @@ ARTICLE_SELECT = """
         confidence_reason,
         sentiment_score_negative,
         sentiment_score_neutral,
-        sentiment_score_positive
+        sentiment_score_positive,
+        sentiment_override
     FROM articles
 """
 
@@ -56,13 +57,14 @@ class ArticleRepository:
                         published_date = EXCLUDED.published_date,
                         crawl_date = EXCLUDED.crawl_date,
                         content = EXCLUDED.content,
-                        sentiment = EXCLUDED.sentiment,
-                        sentiment_confidence = EXCLUDED.sentiment_confidence,
-                        sentiment_reason = EXCLUDED.sentiment_reason,
-                        confidence_reason = EXCLUDED.confidence_reason,
+                        sentiment = CASE WHEN articles.sentiment_override THEN articles.sentiment ELSE EXCLUDED.sentiment END,
+                        sentiment_confidence = CASE WHEN articles.sentiment_override THEN articles.sentiment_confidence ELSE EXCLUDED.sentiment_confidence END,
+                        sentiment_reason = CASE WHEN articles.sentiment_override THEN articles.sentiment_reason ELSE EXCLUDED.sentiment_reason END,
+                        confidence_reason = CASE WHEN articles.sentiment_override THEN articles.confidence_reason ELSE EXCLUDED.confidence_reason END,
                         sentiment_score_negative = EXCLUDED.sentiment_score_negative,
                         sentiment_score_neutral = EXCLUDED.sentiment_score_neutral,
-                        sentiment_score_positive = EXCLUDED.sentiment_score_positive
+                        sentiment_score_positive = EXCLUDED.sentiment_score_positive,
+                        sentiment_override = articles.sentiment_override
                     """,
                     records,
                 )
@@ -118,6 +120,26 @@ class ArticleRepository:
             """,
             (category,),
         )
+
+    def update_sentiment(self, url, sentiment):
+        with database_connection() as connection:
+            row = connection.execute(
+                """
+                UPDATE articles
+                SET sentiment = %s,
+                    sentiment_confidence = 1.0,
+                    sentiment_reason = 'Label diubah manual oleh pengguna.',
+                    confidence_reason = 'Label manual pengguna.',
+                    sentiment_score_negative = CASE WHEN %s = 'Negative' THEN 1.0 ELSE 0.0 END,
+                    sentiment_score_neutral = CASE WHEN %s = 'Neutral' THEN 1.0 ELSE 0.0 END,
+                    sentiment_score_positive = CASE WHEN %s = 'Positive' THEN 1.0 ELSE 0.0 END,
+                    sentiment_override = TRUE
+                WHERE url = %s
+                RETURNING url
+                """,
+                (sentiment, sentiment, sentiment, sentiment, url),
+            ).fetchone()
+        return row is not None
 
     def get_by_date(self, date):
         return self._fetch_all(

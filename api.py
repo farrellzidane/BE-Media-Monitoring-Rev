@@ -9,6 +9,7 @@ from infrastructure.postgresql_database import (
     open_database_pool,
 )
 from presentation.routes import router
+from services.crawl_scheduler import crawl_scheduler
 
 
 @asynccontextmanager
@@ -16,8 +17,12 @@ async def lifespan(_app):
     open_database_pool()
     try:
         initialize_database()
+        from services.settings_service import initialize_defaults
+        initialize_defaults()
+        crawl_scheduler.start()
         yield
     finally:
+        crawl_scheduler.stop()
         close_database_pool()
 
 
@@ -34,7 +39,7 @@ def create_app():
             "http://127.0.0.1:5173",
         ],
         allow_credentials=True,
-        allow_methods=["GET"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
     application.include_router(router)

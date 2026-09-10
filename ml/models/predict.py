@@ -55,6 +55,8 @@ LABELS = {
     2: "Positive",
 }
 
+CONFIDENCE_TEMPERATURE = 0.5
+
 
 def predict(text: str):
     if model is None or tokenizer is None:
@@ -80,7 +82,7 @@ def predict(text: str):
 
     with torch.no_grad():
         outputs = model(**inputs)
-        probabilities = torch.softmax(outputs.logits, dim=-1)
+        probabilities = torch.softmax(outputs.logits / CONFIDENCE_TEMPERATURE, dim=-1)
         confidence, prediction = torch.max(probabilities, dim=1)
 
     return {

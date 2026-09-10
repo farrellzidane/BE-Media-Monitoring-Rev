@@ -43,6 +43,22 @@ from crawler.okezone import (
     get_latest_article_urls as get_okezone_urls
 )
 
+from crawler.generic import build_source
+
+
+INTERNATIONAL_SOURCES = [
+    ("The Hacker News", "https://thehackernews.com/", ("https://feeds.feedburner.com/TheHackersNews",)),
+    ("SecurityWeek", "https://www.securityweek.com/", ("https://feeds.feedburner.com/securityweek",)),
+    ("Cybersecurity News", "https://cybersecuritynews.com/", ("https://cybersecuritynews.com/feed/",)),
+    ("Cybersecurity Dive", "https://www.cybersecuritydive.com/", ("https://www.cybersecuritydive.com/feeds/news/",)),
+    ("BleepingComputer", "https://www.bleepingcomputer.com/", ("https://www.bleepingcomputer.com/feed/",)),
+    ("Dark Reading", "https://www.darkreading.com/", ("https://www.darkreading.com/rss.xml",)),
+    ("KrebsOnSecurity", "https://krebsonsecurity.com/", ("https://krebsonsecurity.com/feed/",)),
+    ("The Record", "https://therecord.media/", ("https://therecord.media/feed",)),
+    ("Help Net Security", "https://www.helpnetsecurity.com/", ("https://www.helpnetsecurity.com/feed/",)),
+    ("Infosecurity Magazine", "https://www.infosecurity-magazine.com/", ("https://www.infosecurity-magazine.com/rss/news/",)),
+]
+
 from crawler.sindonews import (
     get_article as get_sindonews_article,
     get_latest_article_urls as get_sindonews_urls
@@ -61,3 +77,24 @@ SOURCES = [
     ("Okezone", get_okezone_urls, get_okezone_article),
     ("Sindonews", get_sindonews_urls, get_sindonews_article),
 ]
+
+
+def get_sources():
+    configured = list(INTERNATIONAL_SOURCES)
+    try:
+        from services.settings_service import get_custom_sources
+        configured.extend(get_custom_sources())
+    except RuntimeError:
+        pass
+
+    sources = list(SOURCES)
+    seen_urls = set()
+    for source_config in configured:
+        source_name, source_url, *feed_config = source_config
+        feed_urls = feed_config[0] if feed_config else ()
+        if source_url in seen_urls:
+            continue
+        seen_urls.add(source_url)
+        get_urls, get_article = build_source(source_name, source_url, feed_urls)
+        sources.append((source_name, get_urls, get_article))
+    return sources

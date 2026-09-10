@@ -1,4 +1,4 @@
-from config.sources import SOURCES
+from config.sources import get_sources
 
 from config.settings import (
     DATA_DIR,
@@ -37,7 +37,7 @@ def main():
     print(f"CRAWLING TOPIC: {NEWS_TOPIC}")
     print("=" * 40)
 
-    for source_name, get_urls, get_article in SOURCES:
+    for source_name, get_urls, get_article in get_sources():
 
         source_articles = crawl_articles(
             get_urls,
